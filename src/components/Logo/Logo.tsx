@@ -1,17 +1,27 @@
+import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-
-export const Logo = () => {
+interface LogoProps {
+	isCollapsed?: boolean;
+}
+export const Logo = ({ isCollapsed }: LogoProps) => {
 	const navigate = useNavigate();
-
 	const handleLogoClick = () => navigate("/");
 
 	return (
 		<div
-			className=" min-h-20 flex items-center px-6 border-b cursor-pointer gap-2"
+			className=" min-h-14 flex items-center cursor-pointer gap-3"
 			onClick={handleLogoClick}
 		>
-			<img src="/logo.svg" alt="Logo" width={30} height={30} />
-			<h1 className=" font-bold text-xl">Baymax App</h1>
+			<img src="/logo.svg" alt="Logo" className=" h-7 w-7" />
+			<h1
+				className={cn(
+					isCollapsed ? "hidden" : "flex",
+					"font-bold text-lg transition-all duration-700 ease-in-out",
+					"whitespace-nowrap"
+				)}
+			>
+				Baymax App
+			</h1>
 		</div>
 	);
 };

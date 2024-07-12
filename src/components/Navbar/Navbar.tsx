@@ -3,6 +3,7 @@ import { SidebarRoutes } from "../SidebarRoutes";
 import { Input } from "../ui";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Menu, Search } from "lucide-react";
+import { UserNav } from "../UserNav";
 
 export const Navbar = () => {
 	return (
@@ -21,8 +22,9 @@ export const Navbar = () => {
 				<Input placeholder="Buscar..." className=" rounded-lg" />
 				<Search strokeWidth={1} className=" absolute top-2 right-2" />
 			</div>
-			<div className=" flex gap-x-2 items-center">
+			<div className=" flex items-center space-x-4">
 				<ModeToggle />
+				<UserNav />
 			</div>
 		</nav>
 	);

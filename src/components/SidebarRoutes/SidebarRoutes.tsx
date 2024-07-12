@@ -1,44 +1,107 @@
-import { SidebarItem } from "../SidebarItem";
-import { Button } from "../ui/button";
+import {
+	AlertCircle,
+	Archive,
+	ArchiveX,
+	File,
+	Inbox,
+	MessagesSquare,
+	Send,
+	ShoppingCart,
+	Trash2,
+	Users2,
+} from "lucide-react";
+import { Logo } from "../Logo";
+import { Navbar2 } from "../Navbar";
 import { Separator } from "../ui/separator";
-import { dataGeneralSidebar, dataSupportSidebar, dataToolsSidebar } from "./SidebarRoutes.data";
 
 export const SidebarRoutes = () => {
 	return (
-		<div className=" flex flex-col justify-between h-full">
-			<div>
-				<div className=" p-2 md:p-6">
-					<p className=" text-slate-500 mb-2">General</p>
-					{dataGeneralSidebar.map((item) => (
-						<SidebarItem key={item.label} item={item} />
-					))}
-				</div>
-				<Separator />
-                <div className=" p-2 md:p-6">
-					<p className=" text-slate-500 mb-2">Herramientas</p>
-					{dataToolsSidebar.map((item) => (
-						<SidebarItem key={item.label} item={item} />
-					))}
-				</div>
-				<Separator />
-                <div className=" p-2 md:p-6">
-					<p className=" text-slate-500 mb-2">Soporte</p>
-					{dataSupportSidebar.map((item) => (
-						<SidebarItem key={item.label} item={item} />
-					))}
+		<div className=" flex flex-col h-full">
+			<div className=" flex flex-col items-center justify-center m-auto bg-background w-auto ">
+				<Logo />
+			</div>
+			<div className=" flex flex-col justify-between h-full">
+				<div className="h-full">
+					<Separator />
+					<Navbar2
+						padre={"General"}
+						links={[
+							{
+								title: "Inbox",
+								label: "128",
+								icon: Inbox,
+								variant: "default",
+							},
+							{
+								title: "Drafts",
+								label: "9",
+								icon: File,
+								variant: "ghost",
+							},
+							{
+								title: "Sent",
+								label: "",
+								icon: Send,
+								variant: "ghost",
+							},
+							{
+								title: "Junk",
+								label: "23",
+								icon: ArchiveX,
+								variant: "ghost",
+							},
+							{
+								title: "Trash",
+								label: "",
+								icon: Trash2,
+								variant: "ghost",
+							},
+							{
+								title: "Archive",
+								label: "",
+								icon: Archive,
+								variant: "ghost",
+							},
+						]}
+					/>
+					<Separator />
+					<Navbar2
+						padre={"Herramientas"}
+						links={[
+							{
+								title: "Social",
+								label: "972",
+								icon: Users2,
+								variant: "ghost",
+							},
+							{
+								title: "Updates",
+								label: "342",
+								icon: AlertCircle,
+								variant: "ghost",
+							},
+							{
+								title: "Forums",
+								label: "128",
+								icon: MessagesSquare,
+								variant: "ghost",
+							},
+							{
+								title: "Shopping",
+								label: "8",
+								icon: ShoppingCart,
+								variant: "ghost",
+							},
+							{
+								title: "Promotions",
+								label: "21",
+								icon: Archive,
+								variant: "ghost",
+							},
+						]}
+					/>
 				</div>
 			</div>
-            <div>
-                <div className=" text-center p-6">
-                <Button variant={"outline"} className="w-full">
-                    Cerrar sesión
-                </Button>
-                </div>
-                <Separator />
-                <footer className=" my-4  text-center">
-                    2024. Todos los derechos reservados
-                </footer>
-            </div>
 		</div>
 	);
 };
