@@ -20,8 +20,10 @@ export const Logo = ({ isCollapsed }: LogoProps) => {
 					"whitespace-nowrap"
 				)}
 			>
-				Baymax App
+				FastMed App
 			</h1>
 		</div>
 	);
 };
+
+// Baymax

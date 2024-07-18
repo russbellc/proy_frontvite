@@ -1,25 +1,26 @@
 import { cn } from "@/lib/utils";
 import { SidebarItemsProps } from "./SidebarItems.types";
-import { Link, useLocation } from "react-router-dom";
+import { SidebarLink } from "./SidebarLink";
 
-export const SidebarItem = (props: SidebarItemsProps) => {
-	const { item } = props;
-	const { label, icon: Icon, href } = item;
-
-	const location = useLocation();
-
-	const activePath = location.pathname === href;
+export const SidebarItem = ({
+	padre,
+	links,
+	isCollapsed = false,
+}: SidebarItemsProps) => {
 
 	return (
-		<Link
-			to={href}
-			className={cn(
-				` flex gap-x-4 mt-2 light:text-slate-700 dark:text-white text-sm items-center hover:bg-slate-300/20 p-2 rounded-lg cursor-pointer`,
-				activePath && " bg-slate-400/20"
-			)}
+		<div
+			data-collapsed={isCollapsed}
+			className="group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2"
 		>
-			<Icon className="w-5 h-5" strokeWidth={1} />
-			{label}
-		</Link>
+			<p className={cn(isCollapsed ? "hidden" : "", " text-slate-500 px-4")}>
+				{padre}
+			</p>
+			<nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
+				{links.map((link, index) => (
+					<SidebarLink key={index} link={link} isCollapsed={isCollapsed} />
+				))}
+			</nav>
+		</div>
 	);
 };

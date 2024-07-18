@@ -1,6 +1,6 @@
 import { Logo } from "@/components/Logo";
 import { ModeToggle } from "@/components/mode-toggle";
-import { Navbar2 } from "@/components/Navbar";
+import { SidebarItem, SidebarItemsProps } from "@/components/SidebarItem";
 import { SidebarRoutes } from "@/components/SidebarRoutes";
 import {
 	Button,
@@ -39,6 +39,100 @@ interface AppLayoutProps {
 	defaultCollapsed?: boolean;
 	navCollapsedSize?: number;
 }
+
+const nav: SidebarItemsProps[] = [
+	{
+		padre: "General",
+		links: [
+			{
+				title: "Inbox",
+				label: "128",
+				href: "/",
+				icon: Inbox,
+			},
+			{
+				title: "Drafts",
+				label: "9",
+				href: "#",
+				icon: File,
+			},
+			{
+				title: "Sent",
+				label: "",
+				href: "#",
+				icon: Send,
+			},
+		],
+	},
+	{
+		padre: "Herramientas",
+		links: [
+			{
+				title: "Social",
+				label: "972",
+				href: "#",
+				icon: Users2,
+			},
+			{
+				title: "Updates",
+				label: "342",
+				href: "#",
+				icon: AlertCircle,
+			},
+			{
+				title: "Forums",
+				label: "128",
+				href: "#",
+				icon: MessagesSquare,
+			},
+			{
+				title: "Shopping",
+				label: "8",
+				href: "#",
+				icon: ShoppingCart,
+			},
+		],
+	},
+	{
+		padre: "Herramientas",
+		links: [
+			{
+				title: "Promotions",
+				label: "21",
+				href: "#",
+				icon: Archive,
+			},
+		],
+	},
+	{
+		padre: "Herramientas",
+		links: [
+			{
+				title: "Trash",
+				label: "",
+				href: "#",
+				icon: Trash2,
+			},
+			{
+				title: "Archive",
+				label: "",
+				href: "#",
+				icon: ArchiveX,
+			},
+		],
+	},
+	{
+		padre: "Herramientas",
+		links: [
+			{
+				title: "Junk",
+				label: "23",
+				href: "#",
+				icon: ArchiveX,
+			},
+		],
+	},
+];
 
 export const AppLayout = ({
 	defaultLayout = [265, 440, 655],
@@ -90,129 +184,23 @@ export const AppLayout = ({
 						>
 							<Logo isCollapsed={isCollapsed} />
 						</div>
-						<div className=" flex flex-col justify-between h-full">
-							<div className="h-full">
-								<ScrollArea className="h-screen">
-									<Separator />
-									<Navbar2
-										padre={"General"}
-										isCollapsed={isCollapsed}
-										links={[
-											{
-												title: "Inbox",
-												label: "128",
-												icon: Inbox,
-												variant: "default",
-											},
-											{
-												title: "Drafts",
-												label: "9",
-												icon: File,
-												variant: "ghost",
-											},
-											{
-												title: "Sent",
-												label: "",
-												icon: Send,
-												variant: "ghost",
-											},
-											{
-												title: "Junk",
-												label: "23",
-												icon: ArchiveX,
-												variant: "ghost",
-											},
-											{
-												title: "Trash",
-												label: "",
-												icon: Trash2,
-												variant: "ghost",
-											},
-											{
-												title: "Archive",
-												label: "",
-												icon: Archive,
-												variant: "ghost",
-											},
-										]}
-									/>
-									<Separator />
-									<Navbar2
-										padre={"Herramientas"}
-										isCollapsed={isCollapsed}
-										links={[
-											{
-												title: "Social",
-												label: "972",
-												icon: Users2,
-												variant: "ghost",
-											},
-											{
-												title: "Updates",
-												label: "342",
-												icon: AlertCircle,
-												variant: "ghost",
-											},
-											{
-												title: "Forums",
-												label: "128",
-												icon: MessagesSquare,
-												variant: "ghost",
-											},
-											{
-												title: "Shopping",
-												label: "8",
-												icon: ShoppingCart,
-												variant: "ghost",
-											},
-											{
-												title: "Promotions",
-												label: "21",
-												icon: Archive,
-												variant: "ghost",
-											},
-										]}
-									/>
-									<Separator />
-									<Navbar2
-										padre={"Herramientas"}
-										isCollapsed={isCollapsed}
-										links={[
-											{
-												title: "Social",
-												label: "972",
-												icon: Users2,
-												variant: "ghost",
-											},
-											{
-												title: "Updates",
-												label: "342",
-												icon: AlertCircle,
-												variant: "ghost",
-											},
-											{
-												title: "Forums",
-												label: "128",
-												icon: MessagesSquare,
-												variant: "ghost",
-											},
-											{
-												title: "Shopping",
-												label: "8",
-												icon: ShoppingCart,
-												variant: "ghost",
-											},
-											{
-												title: "Promotions",
-												label: "21",
-												icon: Archive,
-												variant: "ghost",
-											},
-										]}
-									/>
-								</ScrollArea>
+						<ScrollArea className="h-full">
+							<div className=" flex flex-col justify-between h-full">
+								<div className="h-full">
+									{nav.map((item, index) => (
+										<>
+											<Separator key={index} />
+											<SidebarItem
+												key={index}
+												padre={item.padre}
+												links={item.links}
+												isCollapsed={isCollapsed}
+											/>
+										</>
+									))}
+								</div>
 							</div>
-						</div>
+						</ScrollArea>
 					</ResizablePanel>
 					<ResizableHandle withHandle />
 					<ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
@@ -224,9 +212,7 @@ export const AppLayout = ({
 											<Menu className="h-4 w-4" />
 										</SheetTrigger>
 										<SheetContent side={"left"}>
-											<ScrollArea className="h-full">
-												<SidebarRoutes />
-											</ScrollArea>
+											<SidebarRoutes nav={nav} />
 										</SheetContent>
 									</Sheet>
 								</div>
@@ -255,16 +241,3 @@ export const AppLayout = ({
 		</>
 	);
 };
-/*
-	<div className="flex w-full h-full">
-				<div className=" hidden xl:block w-80 h-full xl:fixed">
-					<Sidebar />
-				</div>
-				<div className=" w-full xl:ml-80">
-					<Navbar />
-					<div className="p-6 bg-[#fafbfc] dark:bg-secondary">
-						<Outlet />
-					</div>
-				</div>
-			</div>
-*/

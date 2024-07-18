@@ -1,10 +1,14 @@
-import { LucideIcon } from "lucide-react"
+import { LucideProps } from "lucide-react"
 
 export type SidebarItemsProps = {
-    item: {
-        label: string,
-        icon: LucideIcon,
-        href: string
-    },
-    key: string
+	padre: string;
+	isCollapsed?: boolean;
+	links: {
+		title: string;
+		label?: string;
+		href: string;
+		icon: React.ForwardRefExoticComponent<
+			Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+		>;
+	}[];
 }
