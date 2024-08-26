@@ -20,15 +20,11 @@ import { cn } from "@/lib/utils";
 import {
 	AlertCircle,
 	Archive,
-	ArchiveX,
 	File,
 	Inbox,
 	Menu,
-	MessagesSquare,
 	Search,
 	Send,
-	ShoppingCart,
-	Trash2,
 	Users2,
 } from "lucide-react";
 import { useState } from "react";
@@ -45,19 +41,19 @@ const nav: SidebarItemsProps[] = [
 		padre: "General",
 		links: [
 			{
-				title: "Inbox",
+				title: "Colegiados",
 				label: "128",
 				href: "/",
 				icon: Inbox,
 			},
 			{
-				title: "Drafts",
+				title: "Lista de Colegiados",
 				label: "9",
 				href: "#",
 				icon: File,
 			},
 			{
-				title: "Sent",
+				title: "Pagos",
 				label: "",
 				href: "#",
 				icon: Send,
@@ -65,74 +61,134 @@ const nav: SidebarItemsProps[] = [
 		],
 	},
 	{
-		padre: "Herramientas",
+		padre: "Configuración",
 		links: [
 			{
-				title: "Social",
+				title: "Periodos",
 				label: "972",
 				href: "#",
 				icon: Users2,
 			},
 			{
-				title: "Updates",
+				title: "Usuarios",
 				label: "342",
 				href: "#",
 				icon: AlertCircle,
 			},
-			{
-				title: "Forums",
-				label: "128",
-				href: "#",
-				icon: MessagesSquare,
-			},
-			{
-				title: "Shopping",
-				label: "8",
-				href: "#",
-				icon: ShoppingCart,
-			},
 		],
 	},
 	{
-		padre: "Herramientas",
+		padre: "Web",
 		links: [
 			{
-				title: "Promotions",
+				title: "Articulos",
+				label: "21",
+				href: "#",
+				icon: Archive,
+			},
+			{
+				title: "Noticias",
 				label: "21",
 				href: "#",
 				icon: Archive,
 			},
 		],
 	},
-	{
-		padre: "Herramientas",
-		links: [
-			{
-				title: "Trash",
-				label: "",
-				href: "#",
-				icon: Trash2,
-			},
-			{
-				title: "Archive",
-				label: "",
-				href: "#",
-				icon: ArchiveX,
-			},
-		],
-	},
-	{
-		padre: "Herramientas",
-		links: [
-			{
-				title: "Junk",
-				label: "23",
-				href: "#",
-				icon: ArchiveX,
-			},
-		],
-	},
 ];
+
+// const nav: SidebarItemsProps[] = [
+// 	{
+// 		padre: "General",
+// 		links: [
+// 			{
+// 				title: "Inbox",
+// 				label: "128",
+// 				href: "/",
+// 				icon: Inbox,
+// 			},
+// 			{
+// 				title: "Drafts",
+// 				label: "9",
+// 				href: "#",
+// 				icon: File,
+// 			},
+// 			{
+// 				title: "Sent",
+// 				label: "",
+// 				href: "#",
+// 				icon: Send,
+// 			},
+// 		],
+// 	},
+// 	{
+// 		padre: "Herramientas",
+// 		links: [
+// 			{
+// 				title: "Social",
+// 				label: "972",
+// 				href: "#",
+// 				icon: Users2,
+// 			},
+// 			{
+// 				title: "Updates",
+// 				label: "342",
+// 				href: "#",
+// 				icon: AlertCircle,
+// 			},
+// 			{
+// 				title: "Forums",
+// 				label: "128",
+// 				href: "#",
+// 				icon: MessagesSquare,
+// 			},
+// 			{
+// 				title: "Shopping",
+// 				label: "8",
+// 				href: "#",
+// 				icon: ShoppingCart,
+// 			},
+// 		],
+// 	},
+// 	{
+// 		padre: "Herramientas",
+// 		links: [
+// 			{
+// 				title: "Promotions",
+// 				label: "21",
+// 				href: "#",
+// 				icon: Archive,
+// 			},
+// 		],
+// 	},
+// 	{
+// 		padre: "Herramientas",
+// 		links: [
+// 			{
+// 				title: "Trash",
+// 				label: "",
+// 				href: "#",
+// 				icon: Trash2,
+// 			},
+// 			{
+// 				title: "Archive",
+// 				label: "",
+// 				href: "#",
+// 				icon: ArchiveX,
+// 			},
+// 		],
+// 	},
+// 	{
+// 		padre: "Herramientas",
+// 		links: [
+// 			{
+// 				title: "Junk",
+// 				label: "23",
+// 				href: "#",
+// 				icon: ArchiveX,
+// 			},
+// 		],
+// 	},
+// ];
 
 export const AppLayout = ({
 	defaultLayout = [265, 440, 655],

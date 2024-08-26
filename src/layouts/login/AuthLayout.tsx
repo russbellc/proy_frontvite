@@ -21,11 +21,11 @@ export const AuthLayout = () => {
 					<div className="relative z-20 mt-auto">
 						<blockquote className="space-y-2">
 							<p className="text-lg">
-								&ldquo;FastMed ha simplificado mis tareas diarias, ayudándome a
+								&ldquo;FastMed simplifica tareas diarias, ayudándo a
 								proporcionar un cuidado médico eficiente y de alta
 								calidad.&rdquo;
 							</p>
-							<footer className="text-sm">Sofia Davis</footer>
+							<footer className="text-sm">FastDev</footer>
 						</blockquote>
 					</div>
 				</div>
