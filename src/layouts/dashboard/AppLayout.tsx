@@ -4,7 +4,7 @@ import { SidebarItem, SidebarItemsProps } from "@/components/SidebarItem";
 import { SidebarRoutes } from "@/components/SidebarRoutes";
 import {
 	Button,
-	Input,
+	// Input,
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
@@ -18,13 +18,13 @@ import {
 import { UserNav } from "@/components/UserNav";
 import { cn } from "@/lib/utils";
 import {
-	AlertCircle,
 	Archive,
-	File,
-	Inbox,
+	BadgeCheck,
+	HandCoins,
+	LayoutDashboard,
 	Menu,
+	Newspaper,
 	Search,
-	Send,
 	Users2,
 } from "lucide-react";
 import { useState } from "react";
@@ -41,39 +41,22 @@ const nav: SidebarItemsProps[] = [
 		padre: "General",
 		links: [
 			{
-				title: "Colegiados",
-				label: "128",
+				title: "Dashboard",
+				// label: "128",
 				href: "/",
-				icon: Inbox,
+				icon: LayoutDashboard,
 			},
 			{
-				title: "Lista de Colegiados",
-				label: "9",
-				href: "#",
-				icon: File,
-			},
-			{
-				title: "Pagos",
-				label: "",
-				href: "#",
-				icon: Send,
-			},
-		],
-	},
-	{
-		padre: "Configuración",
-		links: [
-			{
-				title: "Periodos",
-				label: "972",
-				href: "#",
+				title: "Colegiados",
+				// label: "128",
+				href: "/colegiados",
 				icon: Users2,
 			},
 			{
-				title: "Usuarios",
-				label: "342",
-				href: "#",
-				icon: AlertCircle,
+				title: "Pagos",
+				// label: "",
+				href: "/pagos",
+				icon: HandCoins,
 			},
 		],
 	},
@@ -82,113 +65,36 @@ const nav: SidebarItemsProps[] = [
 		links: [
 			{
 				title: "Articulos",
-				label: "21",
-				href: "#",
-				icon: Archive,
+				// label: "21",
+				href: "/articulos",
+				icon: Newspaper,
 			},
 			{
 				title: "Noticias",
-				label: "21",
-				href: "#",
+				// label: "21",
+				href: "/noticias",
 				icon: Archive,
 			},
 		],
 	},
+	{
+		padre: "Configuración",
+		links: [
+			{
+				title: "Periodos",
+				// label: "972",
+				href: "/periodos",
+				icon: Users2,
+			},
+			{
+				title: "Estados",
+				// label: "342",
+				href: "/estados",
+				icon: BadgeCheck,
+			},
+		],
+	},
 ];
-
-// const nav: SidebarItemsProps[] = [
-// 	{
-// 		padre: "General",
-// 		links: [
-// 			{
-// 				title: "Inbox",
-// 				label: "128",
-// 				href: "/",
-// 				icon: Inbox,
-// 			},
-// 			{
-// 				title: "Drafts",
-// 				label: "9",
-// 				href: "#",
-// 				icon: File,
-// 			},
-// 			{
-// 				title: "Sent",
-// 				label: "",
-// 				href: "#",
-// 				icon: Send,
-// 			},
-// 		],
-// 	},
-// 	{
-// 		padre: "Herramientas",
-// 		links: [
-// 			{
-// 				title: "Social",
-// 				label: "972",
-// 				href: "#",
-// 				icon: Users2,
-// 			},
-// 			{
-// 				title: "Updates",
-// 				label: "342",
-// 				href: "#",
-// 				icon: AlertCircle,
-// 			},
-// 			{
-// 				title: "Forums",
-// 				label: "128",
-// 				href: "#",
-// 				icon: MessagesSquare,
-// 			},
-// 			{
-// 				title: "Shopping",
-// 				label: "8",
-// 				href: "#",
-// 				icon: ShoppingCart,
-// 			},
-// 		],
-// 	},
-// 	{
-// 		padre: "Herramientas",
-// 		links: [
-// 			{
-// 				title: "Promotions",
-// 				label: "21",
-// 				href: "#",
-// 				icon: Archive,
-// 			},
-// 		],
-// 	},
-// 	{
-// 		padre: "Herramientas",
-// 		links: [
-// 			{
-// 				title: "Trash",
-// 				label: "",
-// 				href: "#",
-// 				icon: Trash2,
-// 			},
-// 			{
-// 				title: "Archive",
-// 				label: "",
-// 				href: "#",
-// 				icon: ArchiveX,
-// 			},
-// 		],
-// 	},
-// 	{
-// 		padre: "Herramientas",
-// 		links: [
-// 			{
-// 				title: "Junk",
-// 				label: "23",
-// 				href: "#",
-// 				icon: ArchiveX,
-// 			},
-// 		],
-// 	},
-// ];
 
 export const AppLayout = ({
 	defaultLayout = [265, 440, 655],
@@ -259,9 +165,13 @@ export const AppLayout = ({
 						</ScrollArea>
 					</ResizablePanel>
 					<ResizableHandle withHandle />
-					<ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+					<ResizablePanel
+						defaultSize={defaultLayout[1]}
+						minSize={30}
+						className={cn("h-screen")}
+					>
 						<div className="flex h-full flex-col">
-							<div className="flex items-center p-2 justify-between gap-x-4 md:pr-6">
+							<div className="flex items-center p-2 justify-between gap-x-4 md:pr-4">
 								<div className=" block md:hidden">
 									<Sheet>
 										<SheetTrigger className=" flex items-center">
@@ -277,19 +187,21 @@ export const AppLayout = ({
 										<Menu className="h-4 w-4" />
 									</Button>
 								</div>
-								<div className=" mx-4 relative w-[500px]">
+								{/* <div className=" mx-4 relative w-[500px]">
 									<Input placeholder="Buscar..." className=" rounded-lg" />
 									<Search strokeWidth={1} className=" absolute top-2 right-2" />
-								</div>
+								</div> */}
 								<div className=" flex items-center space-x-4">
 									<ModeToggle />
 									<UserNav />
 								</div>
 							</div>
 							<Separator />
-							<div className="p-6 h-full bg-[#fafbfc] dark:bg-secondary">
-								<Outlet />
-							</div>
+							<ScrollArea className="h-full">
+								<div className=" flex flex-col p-4 h-full bg-[#fafbfc] dark:bg-secondary">
+									<Outlet />
+								</div>
+							</ScrollArea>
 						</div>
 					</ResizablePanel>
 				</ResizablePanelGroup>

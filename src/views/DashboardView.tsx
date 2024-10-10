@@ -51,6 +51,11 @@ export const DashboardView = () => {
 	return (
 		<div>
 			<h1>Dashboard SWR</h1>
+			<h1>Dashboard SWR</h1>
+			<h1>Dashboard SWR</h1>
+			<h1>Dashboard SWR</h1>
+			<h1>Dashboard SWR</h1>
+			<h1>Dashboard SWR</h1>
 			<ul>
 				{getAll_sys_submenu.map(
 					(submenu: {
