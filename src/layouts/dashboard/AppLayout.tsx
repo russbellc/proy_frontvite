@@ -24,7 +24,6 @@ import {
 	LayoutDashboard,
 	Menu,
 	Newspaper,
-	Search,
 	Users2,
 } from "lucide-react";
 import { useState } from "react";

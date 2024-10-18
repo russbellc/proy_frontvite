@@ -36,16 +36,18 @@ interface DataQuery {
 
 export const DashboardView = () => {
 	const { dataQuery, isLoadingQuery, isErrorQuery }: DataQuery =useQuerySWR(GET_POSTS_CLIENT1);
-
 	const { data, loading, error } = useQuery(GET_POSTS_CLIENT2)
 
-	const { getAll_sys_submenu } = dataQuery || {};
-
-	if (isLoadingQuery) return <p>Loading...</p>;
-	if (isErrorQuery) return <p>Error: {isErrorQuery}</p>;
 
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Error: {error.message}</p>;
+
+	
+	if (isLoadingQuery) return <p>Loading...</p>;
+	if (isErrorQuery) return <p>Error: {isErrorQuery}</p>;
+	
+
+	const { getAll_sys_submenu } = dataQuery || {};
 
 
 	return (

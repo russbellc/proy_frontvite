@@ -1,10 +1,13 @@
 import useSWR, { SWRConfiguration } from 'swr'
 
 export const useQuerySWR = (query: string, config?: SWRConfiguration) => {
-    const { data, error } = useSWR(query, config)
+    const { data, error, isLoading} = useSWR(query, config)
+    //return data, loading and error
+
     return {
         dataQuery: data,
-        isLoadingQuery: !error && !data,
-        isErrorQuery: error
+        isLoadingQuery: isLoading,
+        isErrorQuery: error,
     }
+
 }

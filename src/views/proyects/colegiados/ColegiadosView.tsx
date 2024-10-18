@@ -1,19 +1,19 @@
+import { ListaColegiados } from "@/components/app/Colegiados/ListaColegiados";
 import {
 	Card,
 	CardContent,
-	CardDescription,
+	// CardDescription,
 	CardFooter,
 	CardHeader,
-	CardTitle,
-	Input,
-	Label,
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
+	// CardTitle,
+	// Input,
+	// Label,
+	// Select,
+	// SelectContent,
+	// SelectItem,
+	// SelectTrigger,
+	// SelectValue,
 } from "@/components/ui";
-
 
 export const ColegiadosView = () => {
 	return (
@@ -28,13 +28,14 @@ export const ColegiadosView = () => {
 			</div>
 			<Card>
 				<CardHeader>
-					<CardTitle>Colegiados</CardTitle>
+					{/* <CardTitle>Colegiados</CardTitle>
 					<CardDescription>
 						Listado de colegiados del CROXCUSCO.
-					</CardDescription>
+					</CardDescription> */}
 				</CardHeader>
 				<CardContent>
-					<form>
+          <ListaColegiados />
+          {/* <form>
 						<div className="grid w-full items-center gap-4">
 							<div className="flex flex-col space-y-1.5">
 								<Label htmlFor="name">Name</Label>
@@ -55,7 +56,7 @@ export const ColegiadosView = () => {
 								</Select>
 							</div>
 						</div>
-					</form>
+					</form> */}
 				</CardContent>
 				<CardFooter>
 					<div className="text-xs text-muted-foreground">

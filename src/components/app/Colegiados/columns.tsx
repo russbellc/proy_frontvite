@@ -1,23 +1,97 @@
-import { ColumnDef } from "@tanstack/react-table"
+import { Badge, Button } from "@/components/ui";
+import { ColumnDef } from "@tanstack/react-table";
 
-export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui";
+import { MoreHorizontal } from "lucide-react";
+
+export interface Personas {
+	data: Data;
 }
- 
-export const columns: ColumnDef<Payment>[] = [
-  {
-    accessorKey: "status",
-    header: "Status",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
-  },
-]
+
+export interface Data {
+	getAll_persona: GetAllPersona[];
+}
+
+export interface GetAllPersona {
+	colegiados?: Colegiado[];
+	per_nombre: string;
+	per_appat: string;
+	per_apmat: string;
+	per_nro_doc: string;
+	per_st: null | string;
+}
+
+export interface Colegiado {
+	col_nro_cop: string;
+	col_st: string;
+}
+
+export const columns: ColumnDef<GetAllPersona>[] = [
+	{
+		accessorKey: "ape_nom",
+		header: "Apellidos y Nombres",
+		cell: (info) => (
+			<span>
+				{info.row.original.per_appat} {info.row.original.per_apmat}{" "}
+				{info.row.original.per_nombre}
+			</span>
+		),
+		footer: (props) => props.column.id,
+	},
+	{
+		accessorKey: "per_nro_doc",
+		header: "Nro Documento",
+	},
+	{
+		accessorKey: "col_nro_cop",
+		header: "Nro Colegiado",
+		cell: (info) => (
+			<span>{info.row.original.colegiados?.[0].col_nro_cop}</span>
+		),
+	},
+	{
+		accessorKey: "col_st",
+		header: "Estado",
+		cell: (info) => <span>{info.row.original.colegiados?.[0].col_st}</span>,
+	},
+	{
+		accessorKey: "per_st",
+		header: "Estado",
+		cell: ({ row }) => {
+			const state: number = row.getValue("per_st");
+			const variant =
+				state === 1 ? "secondary" : state === 0 ? "destructive" : "default";
+			return <Badge variant={variant}>{state}</Badge>;
+		},
+	},
+	{
+		id: "actions",
+		// header: "Actions",
+
+		cell: ({ row }) => {
+			// const persona = row.original;
+			return (
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="ghost" className="h-8 w-8 p-0">
+							<MoreHorizontal className="h-4 w-4" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end">
+						<DropdownMenuLabel>Acciones</DropdownMenuLabel>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem>Edit file</DropdownMenuItem>
+						<DropdownMenuItem>Delete file</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			);
+		},
+	},
+];
