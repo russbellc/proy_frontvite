@@ -1,18 +1,21 @@
 import { ListaColegiados } from "@/components/app/Colegiados/ListaColegiados";
 import {
+	Button,
 	Card,
 	CardContent,
-	// CardDescription,
 	CardFooter,
 	CardHeader,
-	// CardTitle,
-	// Input,
-	// Label,
-	// Select,
-	// SelectContent,
-	// SelectItem,
-	// SelectTrigger,
-	// SelectValue,
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
 } from "@/components/ui";
 
 export const ColegiadosView = () => {
@@ -28,35 +31,30 @@ export const ColegiadosView = () => {
 			</div>
 			<Card>
 				<CardHeader>
-					{/* <CardTitle>Colegiados</CardTitle>
-					<CardDescription>
-						Listado de colegiados del CROXCUSCO.
-					</CardDescription> */}
+					<div className="flex items-center justify-start">
+						<Dialog>
+							<DialogTrigger asChild>
+								<Button variant="secondary" size="sm">
+									Nuevo Colegiado
+								</Button>
+							</DialogTrigger>
+							<DialogContent>
+								<DialogHeader>
+									<DialogTitle>Are you absolutely sure?</DialogTitle>
+									<DialogDescription>
+										This action cannot be undone. Are you sure you want to
+										permanently delete this file from our servers?
+									</DialogDescription>
+								</DialogHeader>
+								<DialogFooter>
+									<Button type="submit">Confirm</Button>
+								</DialogFooter>
+							</DialogContent>
+						</Dialog>
+					</div>
 				</CardHeader>
 				<CardContent>
-          <ListaColegiados />
-          {/* <form>
-						<div className="grid w-full items-center gap-4">
-							<div className="flex flex-col space-y-1.5">
-								<Label htmlFor="name">Name</Label>
-								<Input id="name" placeholder="Name of your project" />
-							</div>
-							<div className="flex flex-col space-y-1.5">
-								<Label htmlFor="framework">Framework</Label>
-								<Select>
-									<SelectTrigger id="framework">
-										<SelectValue placeholder="Select" />
-									</SelectTrigger>
-									<SelectContent position="popper">
-										<SelectItem value="next">Next.js</SelectItem>
-										<SelectItem value="sveltekit">SvelteKit</SelectItem>
-										<SelectItem value="astro">Astro</SelectItem>
-										<SelectItem value="nuxt">Nuxt.js</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-						</div>
-					</form> */}
+					<ListaColegiados />
 				</CardContent>
 				<CardFooter>
 					<div className="text-xs text-muted-foreground">
