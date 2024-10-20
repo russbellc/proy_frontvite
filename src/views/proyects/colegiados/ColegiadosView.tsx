@@ -5,12 +5,6 @@ import {
 	CardContent,
 	CardFooter,
 	CardHeader,
-<<<<<<< HEAD
-=======
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuTrigger,
 	Dialog,
 	DialogContent,
 	DialogDescription,
@@ -18,7 +12,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
->>>>>>> 47cea542f6a9dc69ff1f97ed58def489e2c20c63
 } from "@/components/ui";
 
 export const ColegiadosView = () => {
@@ -34,17 +27,6 @@ export const ColegiadosView = () => {
 			</div>
 			<Card>
 				<CardHeader>
-<<<<<<< HEAD
-				<div className="flex items-center justify-start space-x-2 py-4">
-				<Button
-					variant="outline"
-					size="sm"
-					// onClick={() => table.previousPage()}
-				>
-					NUEVO COLEGIADO
-				</Button>
-			</div>
-=======
 					<div className="flex items-center justify-start">
 						<Dialog>
 							<DialogTrigger asChild>
@@ -66,7 +48,6 @@ export const ColegiadosView = () => {
 							</DialogContent>
 						</Dialog>
 					</div>
->>>>>>> 47cea542f6a9dc69ff1f97ed58def489e2c20c63
 				</CardHeader>
 				<CardContent>
 					<ListaColegiados />
