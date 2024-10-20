@@ -1,18 +1,10 @@
 import { ListaColegiados } from "@/components/app/Colegiados/ListaColegiados";
 import {
+	Button,
 	Card,
 	CardContent,
-	// CardDescription,
 	CardFooter,
 	CardHeader,
-	// CardTitle,
-	// Input,
-	// Label,
-	// Select,
-	// SelectContent,
-	// SelectItem,
-	// SelectTrigger,
-	// SelectValue,
 } from "@/components/ui";
 
 export const ColegiadosView = () => {
@@ -28,35 +20,18 @@ export const ColegiadosView = () => {
 			</div>
 			<Card>
 				<CardHeader>
-					{/* <CardTitle>Colegiados</CardTitle>
-					<CardDescription>
-						Listado de colegiados del CROXCUSCO.
-					</CardDescription> */}
+				<div className="flex items-center justify-start space-x-2 py-4">
+				<Button
+					variant="outline"
+					size="sm"
+					// onClick={() => table.previousPage()}
+				>
+					NUEVO COLEGIADO
+				</Button>
+			</div>
 				</CardHeader>
 				<CardContent>
-          <ListaColegiados />
-          {/* <form>
-						<div className="grid w-full items-center gap-4">
-							<div className="flex flex-col space-y-1.5">
-								<Label htmlFor="name">Name</Label>
-								<Input id="name" placeholder="Name of your project" />
-							</div>
-							<div className="flex flex-col space-y-1.5">
-								<Label htmlFor="framework">Framework</Label>
-								<Select>
-									<SelectTrigger id="framework">
-										<SelectValue placeholder="Select" />
-									</SelectTrigger>
-									<SelectContent position="popper">
-										<SelectItem value="next">Next.js</SelectItem>
-										<SelectItem value="sveltekit">SvelteKit</SelectItem>
-										<SelectItem value="astro">Astro</SelectItem>
-										<SelectItem value="nuxt">Nuxt.js</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-						</div>
-					</form> */}
+					<ListaColegiados />
 				</CardContent>
 				<CardFooter>
 					<div className="text-xs text-muted-foreground">
