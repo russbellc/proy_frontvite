@@ -20,19 +20,19 @@ interface Props {
 	// setIsOpen: (open: boolean) => void;
 }
 
-type Status = {
-	value: string;
-	label: string;
-};
+// type Status = {
+// 	value: string;
+// 	label: string;
+// };
 
-const tdoc: Status[] = [
-	{ value: "DNI", label: "DNI" },
-	{ value: "RUC", label: "RUC" },
-];
-const sexo: Status[] = [
-	{ value: "M", label: "Masculino" },
-	{ value: "F", label: "Femenino" },
-];
+// const tdoc: Status[] = [
+// 	{ value: "DNI", label: "DNI" },
+// 	{ value: "RUC", label: "RUC" },
+// ];
+// const sexo: Status[] = [
+// 	{ value: "M", label: "Masculino" },
+// 	{ value: "F", label: "Femenino" },
+// ];
 
 
 const formSchema = z.object({
