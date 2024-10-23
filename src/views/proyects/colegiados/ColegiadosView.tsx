@@ -5,20 +5,15 @@ import {
 	CardContent,
 	CardFooter,
 	CardHeader,
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuTrigger,
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui";
+import { useNavigate } from "react-router-dom";
 
 export const ColegiadosView = () => {
+	const navigate = useNavigate(); // Hook para cambiar de página
+
+	const handleNavigate = () => {
+		navigate("/colegiados/new"); // Cambiar a la ruta deseada
+	};
 	return (
 		<div>
 			<div className="flex items-center justify-between space-y-2 px-4 pb-3 pt-2">
@@ -32,25 +27,9 @@ export const ColegiadosView = () => {
 			<Card>
 				<CardHeader>
 					<div className="flex items-center justify-start">
-						<Dialog>
-							<DialogTrigger asChild>
-								<Button variant="secondary" size="sm">
-									Nuevo Colegiado
-								</Button>
-							</DialogTrigger>
-							<DialogContent>
-								<DialogHeader>
-									<DialogTitle>Are you absolutely sure?</DialogTitle>
-									<DialogDescription>
-										This action cannot be undone. Are you sure you want to
-										permanently delete this file from our servers?
-									</DialogDescription>
-								</DialogHeader>
-								<DialogFooter>
-									<Button type="submit">Confirm</Button>
-								</DialogFooter>
-							</DialogContent>
-						</Dialog>
+						<Button variant="secondary" size="sm" onClick={handleNavigate}>
+							Nuevo Colegiado
+						</Button>
 					</div>
 				</CardHeader>
 				<CardContent>

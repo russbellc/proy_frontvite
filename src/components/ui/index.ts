@@ -5,6 +5,7 @@ export * from './card';
 export * from './context-menu';
 export * from './dialog';
 export * from './dropdown-menu';
+export * from './form';
 export * from './input';
 export * from './label';
 export * from './resizable';
