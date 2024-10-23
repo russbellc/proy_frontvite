@@ -5,37 +5,62 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
 	Button,
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
 	Form,
 	FormControl,
+	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
 	FormMessage,
 	Input,
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
 } from "@/components/ui";
-import { calcularEdad } from "@/lib/utils";
+import { calcularEdad, cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
 
 interface Props {
 	// isOpen: boolean;
 	// setIsOpen: (open: boolean) => void;
 }
 
-// type Status = {
-// 	value: string;
-// 	label: string;
-// };
+type Status = {
+	value: string;
+	label: string;
+};
 
-// const tdoc: Status[] = [
-// 	{ value: "DNI", label: "DNI" },
-// 	{ value: "RUC", label: "RUC" },
-// ];
+const per_tdoc: Status[] = [
+	{ value: "DNI", label: "DNI" },
+	{ value: "RUC", label: "RUC" },
+] as const;
+
+// const languages = [
+// 	{ label: "English", value: "en" },
+// 	{ label: "French", value: "fr" },
+// 	{ label: "German", value: "de" },
+// 	{ label: "Spanish", value: "es" },
+// 	{ label: "Portuguese", value: "pt" },
+// 	{ label: "Russian", value: "ru" },
+// 	{ label: "Japanese", value: "ja" },
+// 	{ label: "Korean", value: "ko" },
+// 	{ label: "Chinese", value: "zh" },
+// ] as const;
 // const sexo: Status[] = [
 // 	{ value: "M", label: "Masculino" },
 // 	{ value: "F", label: "Femenino" },
 // ];
 
-
 const formSchema = z.object({
+	language: z.string({
+		required_error: "Please select a language.",
+	}),
 	per_tdoc: z.string({
 		required_error: "Selecciona un tipo de documento",
 	}),
@@ -138,7 +163,6 @@ export const NewColegiados: FC<Props> = () => {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			per_tdoc: "DNI",
 			per_nro_doc: 0,
 			per_nombre: "",
 			per_appat: "",
@@ -186,6 +210,69 @@ export const NewColegiados: FC<Props> = () => {
 					/>
 				</div>
 				{/* per_nro_doc */}
+				<div className="col-start-3">
+					<FormField
+						control={form.control}
+						name="per_tdoc"
+						render={({ field }) => (
+							<FormItem className="flex flex-col">
+								<FormLabel>Nro de Documento</FormLabel>
+								<Popover>
+									<PopoverTrigger asChild>
+										<FormControl>
+											<Button
+												variant="outline"
+												role="combobox"
+												className={cn(
+													"w-[200px] justify-between",
+													!field.value && "text-muted-foreground"
+												)}
+											>
+												{field.value
+													? per_tdoc.find((doc) => doc.value === field.value)?.label
+													: "Seleccione un Documento"}
+												<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+											</Button>
+										</FormControl>
+									</PopoverTrigger>
+									<PopoverContent className="w-[200px] p-0">
+										<Command>
+											<CommandInput placeholder="Busque un Documento..." />
+											<CommandList>
+												<CommandEmpty>No language found.</CommandEmpty>
+												<CommandGroup>
+													{per_tdoc.map((doc) => (
+														<CommandItem
+															value={doc.label}
+															key={doc.value}
+															onSelect={() => {
+																form.setValue("per_tdoc", doc.value);
+															}}
+														>
+															<Check
+																className={cn(
+																	"mr-2 h-4 w-4",
+																	doc.value === field.value
+																		? "opacity-100"
+																		: "opacity-0"
+																)}
+															/>
+															{doc.label}
+														</CommandItem>
+													))}
+												</CommandGroup>
+											</CommandList>
+										</Command>
+									</PopoverContent>
+								</Popover>
+								<FormDescription>
+									This is the language that will be used in the dashboard.
+								</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+				</div>
 				{/* per_nombre */}
 				{/* per_appat */}
 				{/* per_apmat */}
