@@ -22,6 +22,8 @@ import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
+	RadioGroup,
+	RadioGroupItem,
 } from "@/components/ui";
 import { calcularEdad, cn } from "@/lib/utils";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
@@ -58,10 +60,10 @@ const per_tdoc: Status[] = [
 // 	{ label: "Korean", value: "ko" },
 // 	{ label: "Chinese", value: "zh" },
 // ] as const;
-// const sexo: Status[] = [
-// 	{ value: "M", label: "Masculino" },
-// 	{ value: "F", label: "Femenino" },
-// ];
+const per_sexo: Status[] = [
+	{ value: "M", label: "Masculino" },
+	{ value: "F", label: "Femenino" },
+] as const;
 
 const formSchema = z.object({
 	col_nro_cop: z
@@ -183,7 +185,7 @@ export const NewColegiados: FC<Props> = () => {
 			per_nombre: "",
 			per_appat: "",
 			per_apmat: "",
-			per_sexo: "Masculino",
+			per_sexo: "M",
 			per_correo: "",
 			per_nacionalidad: "",
 			per_direccion1: "",
@@ -212,10 +214,12 @@ export const NewColegiados: FC<Props> = () => {
 							name="per_tdoc"
 							render={({ field }) => (
 								<FormItem className="flex flex-col">
-									<FormLabel className={cn(
+									<FormLabel
+										className={cn(
 											"block text-sm font-semibold",
 											!field.value && "text-muted-foreground"
-										)}>
+										)}
+									>
 										Tipo de Documento
 									</FormLabel>
 									<Popover open={open} onOpenChange={setOpen}>
@@ -284,10 +288,12 @@ export const NewColegiados: FC<Props> = () => {
 							name="per_nro_doc"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel className={cn(
+									<FormLabel
+										className={cn(
 											"block text-sm font-semibold",
 											!field.value && "text-muted-foreground"
-										)}>
+										)}
+									>
 										Nro de Documento
 									</FormLabel>
 									<FormControl>
@@ -309,14 +315,16 @@ export const NewColegiados: FC<Props> = () => {
 							name="col_nro_cop"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel className={cn(
+									<FormLabel
+										className={cn(
 											"block text-sm font-semibold",
 											!field.value && "text-muted-foreground"
-										)}>
+										)}
+									>
 										Nro. COP
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Nro COP" {...field} maxLength={12} />
+										<Input placeholder="Nro COP" {...field} maxLength={8} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -344,7 +352,7 @@ export const NewColegiados: FC<Props> = () => {
 												<Button
 													variant={"outline"}
 													className={cn(
-														"w-[240px] pl-3 text-left font-normal",
+														"w-auto pl-3 text-left font-normal",
 														!field.value && "text-muted-foreground"
 													)}
 												>
@@ -376,11 +384,76 @@ export const NewColegiados: FC<Props> = () => {
 						/>
 					</div>
 					{/* per_sexo */}
-					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">5</div>
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_sexo"
+							render={({ field }) => (
+								<FormItem className="space-y-3">
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Sexo
+									</FormLabel>
+									<FormControl>
+										<RadioGroup
+											onValueChange={field.onChange}
+											defaultValue={field.value}
+											className="flex space-x-4"
+										>
+											{per_sexo.map((sexo) => (
+												<FormItem
+													key={sexo.value}
+													className="flex items-end space-x-2"
+												>
+													<FormControl className="rounded-full">
+														<RadioGroupItem
+															value={sexo.value}
+															className="h-4 w-4"
+														/>
+													</FormControl>
+													<FormLabel className="font-normal">
+														{sexo.label}
+													</FormLabel>
+												</FormItem>
+											))}
+										</RadioGroup>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_nombre */}
-					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">6</div>
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_nombre"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Nombre Completo
+									</FormLabel>
+									<FormControl>
+										<Input placeholder="Nro COP" {...field} maxLength={8} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_appat */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">6</div>
 					{/* per_apmat */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">6</div>
 					{/* per_correo */}
 					{/* per_nacionalidad */}
 					{/* per_direccion1 */}
