@@ -2,19 +2,6 @@ import client2 from "@/client/client2"
 import { UserLoginForm } from "@/types"
 import { gql } from "@apollo/client";
 
-interface AuthResponseGraphQL {
-    data: {
-        login: {
-            token: string;
-            user: {
-                usu_id: string;
-                usu_correo: string;
-                usu_nombre: string;
-            };
-        }
-    }
-}
-
 //autenticacion de usuario con swr y graphql
 export const authenticateUser = async (formData: UserLoginForm) => {
 
@@ -33,7 +20,8 @@ export const authenticateUser = async (formData: UserLoginForm) => {
         }
     `;
     try {
-        const { data: { login: { token, user } } }: AuthResponseGraphQL = await client2.mutate({ mutation: AuthUserGQL })
+        const { data } = await client2.mutate({ mutation: AuthUserGQL })
+        const { token, user } = data.login
         localStorage.setItem('token', token)
         return user
     } catch (error) {

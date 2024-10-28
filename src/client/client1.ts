@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 
 const client1 = new ApolloClient({
-    uri: "http://localhost:2002/",
+    uri: import.meta.env.VITE_GRAPH_SERVER,
     cache: new InMemoryCache()
 })
 

@@ -2,7 +2,6 @@ import { FC, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import {
 	Button,
 	Calendar,
@@ -24,175 +23,41 @@ import {
 	PopoverTrigger,
 	RadioGroup,
 	RadioGroupItem,
+	Textarea,
 } from "@/components/ui";
-import { calcularEdad, cn } from "@/lib/utils";
+import { cn, col_st, per_sexo, per_st, per_tdoc } from "@/lib/utils";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { FormColegiado, formSchema } from "@/types";
+import { createColegiado } from "@/graphql";
 
-interface Props {
-	// isOpen: boolean;
-	// setIsOpen: (open: boolean) => void;
-}
-
-type Status = {
-	value: string;
-	label: string;
-};
-
-const per_tdoc: Status[] = [
-	{ value: "DNI", label: "DNI" },
-	{ value: "CARNET DE EXTRANJERIA", label: "CARNET DE EXTRANJERIA" },
-	{ value: "PASAPORTE", label: "PASAPORTE" },
-	{ value: "CARNET DE RESIDENCIA", label: "CARNET DE RESIDENCIA" },
-	{ value: "PARTIDA DE NACIMIENTO", label: "PARTIDA DE NACIMIENTO" },
-	{ value: "OTRO", label: "OTRO" },
-] as const;
-
-// const languages = [
-// 	{ label: "English", value: "en" },
-// 	{ label: "French", value: "fr" },
-// 	{ label: "German", value: "de" },
-// 	{ label: "Spanish", value: "es" },
-// 	{ label: "Portuguese", value: "pt" },
-// 	{ label: "Russian", value: "ru" },
-// 	{ label: "Japanese", value: "ja" },
-// 	{ label: "Korean", value: "ko" },
-// 	{ label: "Chinese", value: "zh" },
-// ] as const;
-const per_sexo: Status[] = [
-	{ value: "M", label: "Masculino" },
-	{ value: "F", label: "Femenino" },
-] as const;
-
-const formSchema = z.object({
-	col_nro_cop: z
-		.string()
-		.min(5, {
-			message: "Numero de COP debe tener al menos 5 caracteres",
-		})
-		.max(8, {
-			message: "Numero de COP debe tener maximo 8 caracteres",
-		}),
-	col_fecha_colegiatura: z.date({
-		required_error: "Selecciona una fecha",
-	}),
-	per_tdoc: z.string({
-		required_error: "Selecciona un tipo de documento",
-	}),
-	per_sexo: z.string({
-		required_error: "Selecciona un sexo",
-	}),
-	per_nro_doc: z
-		.string()
-		.min(8, {
-			message: "Numero de documento debe tener al menos 8 caracteres",
-		})
-		.max(12, {
-			message: "Numero de documento debe tener maximo 12 caracteres",
-		}),
-	per_nombre: z
-		.string()
-		.min(2, {
-			message: "Nombre debe tener al menos 2 caracteres",
-		})
-		.max(50),
-	per_appat: z
-		.string()
-		.min(2, {
-			message: "Apellido Paterno debe tener al menos 2 caracteres",
-		})
-		.max(50, {
-			message: "Apellido Paterno debe tener maximo 50 caracteres",
-		}),
-	per_apmat: z
-		.string()
-		.min(2, {
-			message: "Apellido Materno debe tener al menos 2 caracteres",
-		})
-		.max(50),
-	per_correo: z
-		.string()
-		.email({
-			message: "Correo electronico invalido",
-		})
-		.nullable(),
-	per_nacionalidad: z
-		.string()
-		.min(2, {
-			message: "Nacionalidad debe tener al menos 2 caracteres",
-		})
-		.max(50, {
-			message: "Nacionalidad debe tener maximo 50 caracteres",
-		})
-		.nullable(),
-	per_direccion1: z
-		.string()
-		.min(2, {
-			message: "Direccion debe tener al menos 2 caracteres",
-		})
-		.max(50, {
-			message: "Direccion debe tener maximo 50 caracteres",
-		})
-		.nullable(),
-	per_direccion2: z
-		.string()
-		.min(2, {
-			message: "Direccion debe tener al menos 2 caracteres",
-		})
-		.max(50, {
-			message: "Direccion debe tener maximo 50 caracteres",
-		})
-		.nullable(),
-	per_lugar_nac: z.string().min(2).max(50).nullable(),
-	per_fech_nac: z
-		.date()
-		.refine((fecha) => calcularEdad(fecha) >= 18, {
-			message: "Debes tener al menos 18 años",
-		})
-		.refine((fecha) => calcularEdad(fecha) <= 90, {
-			message: "La edad máxima permitida es 90 años",
-		}),
-	per_st: z.string().min(2).max(50).nullable(),
-	per_telf: z
-		.string()
-		.regex(/^\d{6,7}$/, {
-			message: "El número de teléfono fijo debe tener entre 6 y 7 dígitos",
-		})
-		.nullable(),
-	per_celular1: z
-		.string()
-		.regex(/^9\d{8}$/, {
-			message: "El número de celular debe tener 9 dígitos y comenzar con '9'",
-		})
-		.nullable(),
-	per_celular2: z
-		.string()
-		.regex(/^9\d{8}$/, {
-			message: "El número de celular debe tener 9 dígitos y comenzar con '9'",
-		})
-		.nullable(),
-});
-
-export const NewColegiados: FC<Props> = () => {
+export const NewColegiados: FC = () => {
 	const [open, setOpen] = useState(false);
+	const [estado, setEstado] = useState(false);
+	const [estadoCol, setEstadoCol] = useState(false);
+
 	// 1. Define your form.
-	const form = useForm<z.infer<typeof formSchema>>({
+	const form = useForm<FormColegiado>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			per_tdoc: "DNI",
 			// per_nro_doc: 0,
+			col_fecha_colegiatura: new Date(),
+			col_nro_cop: "",
+			col_st: "HABILITADO",
+			col_obs: "",
+			col_centro_trabajo: "",
+			per_tdoc: "DNI",
+			per_sexo: "M",
+			per_nro_doc: "",
 			per_nombre: "",
 			per_appat: "",
 			per_apmat: "",
-			per_sexo: "M",
-			per_correo: "",
-			per_nacionalidad: "",
+			per_nacionalidad: "Peruano",
 			per_direccion1: "",
 			per_direccion2: "",
 			per_lugar_nac: "",
-			per_fech_nac: new Date("2008-01-01"),
-			per_st: "",
+			per_st: "ACTIVO",
 			per_telf: "",
 			per_celular1: "",
 			per_celular2: "",
@@ -200,8 +65,8 @@ export const NewColegiados: FC<Props> = () => {
 	});
 
 	// 2. Define a submit handler.
-	const onSubmit = (values: z.infer<typeof formSchema>) => {
-		console.log(values);
+	const onSubmit = (values: FormColegiado) => {
+		createColegiado(values);
 	};
 	return (
 		<Form {...form}>
@@ -443,7 +308,11 @@ export const NewColegiados: FC<Props> = () => {
 										Nombre Completo
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Nro COP" {...field} maxLength={8} />
+										<Input
+											placeholder="Nombre Completo"
+											{...field}
+											maxLength={8}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -451,21 +320,484 @@ export const NewColegiados: FC<Props> = () => {
 						/>
 					</div>
 					{/* per_appat */}
-					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">6</div>
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_appat"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Apellido Paterno
+									</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Apellido Paterno"
+											{...field}
+											maxLength={8}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_apmat */}
-					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">6</div>
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_apmat"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Apellido Materno
+									</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Apellido Materno"
+											{...field}
+											maxLength={8}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_correo */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_correo"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Correo Electrónico
+									</FormLabel>
+									<FormControl>
+										<Input placeholder="Correo Electrónico" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_nacionalidad */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_nacionalidad"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Nacionalidad
+									</FormLabel>
+									<FormControl>
+										<Input placeholder="Nacionalidad" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_direccion1 */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-2/6">
+						<FormField
+							control={form.control}
+							name="per_direccion1"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Dirección 1
+									</FormLabel>
+									<FormControl>
+										<Input placeholder="Dirección" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_direccion2 */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-2/6">
+						<FormField
+							control={form.control}
+							name="per_direccion2"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Dirección 2
+									</FormLabel>
+									<FormControl>
+										<Input placeholder="Dirección" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_lugar_nac */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_lugar_nac"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Ubigeo de Nacimiento
+									</FormLabel>
+									<FormControl>
+										<Input placeholder="070101" {...field} maxLength={6} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_fech_nac */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_fech_nac"
+							render={({ field }) => (
+								<FormItem className="flex flex-col">
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Fecha de nacimiento
+									</FormLabel>
+									<FormControl>
+										<Input type="date" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_st */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_st"
+							render={({ field }) => (
+								<FormItem className="flex flex-col">
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Estado actual
+									</FormLabel>
+									<Popover open={estado} onOpenChange={setEstado}>
+										<PopoverTrigger asChild>
+											<FormControl>
+												<Button
+													variant="outline"
+													role="combobox"
+													aria-expanded={estado}
+													className={cn(
+														"w-auto justify-between",
+														!field.value && "text-muted-foreground"
+													)}
+												>
+													{field.value
+														? per_st.find((doc) => doc.value === field.value)
+																?.label
+														: "Selecciona un estado"}
+													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+												</Button>
+											</FormControl>
+										</PopoverTrigger>
+										<PopoverContent className="w-40 p-0">
+											<Command>
+												<CommandInput placeholder="Busque un estado..." />
+												<CommandList>
+													<CommandEmpty>
+														No se encontró ningún estado.
+													</CommandEmpty>
+													<CommandGroup>
+														{per_st.map((doc) => (
+															<CommandItem
+																value={doc.label}
+																key={doc.value}
+																onSelect={() => {
+																	form.setValue("per_st", doc.value);
+																	setEstado(false);
+																}}
+															>
+																<Check
+																	className={cn(
+																		"mr-2 h-4 w-4",
+																		doc.value === field.value
+																			? "opacity-100"
+																			: "opacity-0"
+																	)}
+																/>
+																{doc.label}
+															</CommandItem>
+														))}
+													</CommandGroup>
+												</CommandList>
+											</Command>
+										</PopoverContent>
+									</Popover>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_telf */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_telf"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Número de teléfono
+									</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Número de teléfono"
+											{...field}
+											maxLength={9}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_celular1 */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_celular1"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Número de celular 1
+									</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Número de celular"
+											{...field}
+											maxLength={9}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 					{/* per_celular2 */}
-					<div className="col-span-2 col-start-1 row-start-6">
-						<Button type="submit" size={"default"}>
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="per_celular2"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Número de celular 2
+									</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Número de celular"
+											{...field}
+											maxLength={9}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+					{/* col_st */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+						<FormField
+							control={form.control}
+							name="col_st"
+							render={({ field }) => (
+								<FormItem className="flex flex-col">
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Estado del Colegiado
+									</FormLabel>
+									<Popover open={estadoCol} onOpenChange={setEstadoCol}>
+										<PopoverTrigger asChild>
+											<FormControl>
+												<Button
+													variant="outline"
+													role="combobox"
+													aria-expanded={estadoCol}
+													className={cn(
+														"w-auto justify-between",
+														!field.value && "text-muted-foreground",
+														field.value === "HABILITADO"
+															? "bg-green-700"
+															: "bg-red-700"
+													)}
+												>
+													{field.value
+														? col_st.find((doc) => doc.value === field.value)
+																?.label
+														: "Selecciona un estado"}
+													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+												</Button>
+											</FormControl>
+										</PopoverTrigger>
+										<PopoverContent className="w-40 p-0">
+											<Command>
+												<CommandInput placeholder="Busque un estado..." />
+												<CommandList>
+													<CommandEmpty>
+														No se encontró ningún estado.
+													</CommandEmpty>
+													<CommandGroup>
+														{col_st.map((doc) => (
+															<CommandItem
+																value={doc.label}
+																key={doc.value}
+																onSelect={() => {
+																	form.setValue("col_st", doc.value);
+																	setEstadoCol(false);
+																}}
+															>
+																<Check
+																	className={cn(
+																		"mr-2 h-4 w-4",
+																		doc.value === field.value
+																			? "opacity-100"
+																			: "opacity-0"
+																	)}
+																/>
+																{doc.label}
+															</CommandItem>
+														))}
+													</CommandGroup>
+												</CommandList>
+											</Command>
+										</PopoverContent>
+									</Popover>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+					{/* col_centro_trabajo */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-2/6">
+						<FormField
+							control={form.control}
+							name="col_centro_trabajo"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Centro de trabajo
+									</FormLabel>
+									<FormControl>
+										<Input placeholder="Centro de trabajo" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+					{/* col_obs */}
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-5/6">
+						<FormField
+							control={form.control}
+							name="col_obs"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!field.value && "text-muted-foreground"
+										)}
+									>
+										Obserbaciones
+									</FormLabel>
+									<FormControl>
+										<Textarea
+											placeholder="Obserbaciones"
+											className="resize-x"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-6/6">
+						<Button
+							type="submit"
+							variant="secondary"
+							size="default"
+							className="w-full sm:w-auto"
+						>
 							Guardar
 						</Button>
 					</div>

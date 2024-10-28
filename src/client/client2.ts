@@ -1,7 +1,7 @@
 import { ApolloClient, ApolloLink, createHttpLink, InMemoryCache } from "@apollo/client";
 
 const httpLink = createHttpLink({
-    uri: "http://localhost:2002/",
+    uri: import.meta.env.VITE_GRAPH_SERVER,
 })
 
 const authLink = new ApolloLink((operation, forward) => {
