@@ -31,7 +31,7 @@ export const formSchema = z.object({
     }),
     col_obs: z.string(),
     col_centro_trabajo: z.string().nullable(),
-    per_tdoc: z.string({
+    per_tdoc: z.number({
         required_error: "Selecciona un tipo de documento",
     }),
     per_sexo: z.string({

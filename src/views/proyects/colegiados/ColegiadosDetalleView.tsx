@@ -1,11 +1,5 @@
 import { NewColegiados } from "@/components/app/Colegiados/NewColegiados";
-import {
-	// Button,
-	Card,
-	CardContent,
-	// CardFooter,
-	// CardHeader,
-} from "@/components/ui";
+import { Card, CardContent } from "@/components/ui";
 import { useParams } from "react-router-dom";
 
 export const ColegiadosDetalleView = () => {
@@ -23,23 +17,11 @@ export const ColegiadosDetalleView = () => {
 				</div>
 			</div>
 			<Card>
-				{/* <CardHeader>
-					<div className="flex items-center justify-start">
-						<Button variant="secondary" size="sm">
-							Nuevo Colegiado
-						</Button>
-					</div>
-				</CardHeader> */}
 				<CardContent>
 					<div className=" pt-5">
-						<NewColegiados />
+						<NewColegiados id={id ?? "new"} />
 					</div>
 				</CardContent>
-				{/* <CardFooter>
-					<div className="text-xs text-muted-foreground">
-						Showing <strong>1-10</strong> of <strong>32</strong> products
-					</div>
-				</CardFooter> */}
 			</Card>
 		</div>
 	);

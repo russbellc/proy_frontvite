@@ -32,7 +32,11 @@ import { es } from "date-fns/locale";
 import { FormColegiado, formSchema } from "@/types";
 import { createColegiado } from "@/graphql";
 
-export const NewColegiados: FC = () => {
+interface Props {
+	id: string;
+}
+
+export const NewColegiados: FC<Props> = ({ id }) => {
 	const [open, setOpen] = useState(false);
 	const [estado, setEstado] = useState(false);
 	const [estadoCol, setEstadoCol] = useState(false);
@@ -44,10 +48,10 @@ export const NewColegiados: FC = () => {
 			// per_nro_doc: 0,
 			col_fecha_colegiatura: new Date(),
 			col_nro_cop: "",
-			col_st: "HABILITADO",
+			col_st: "Habilitado",
 			col_obs: "",
 			col_centro_trabajo: "",
-			per_tdoc: "DNI",
+			per_tdoc: "1",
 			per_sexo: "M",
 			per_nro_doc: "",
 			per_nombre: "",
@@ -57,7 +61,7 @@ export const NewColegiados: FC = () => {
 			per_direccion1: "",
 			per_direccion2: "",
 			per_lugar_nac: "",
-			per_st: "ACTIVO",
+			per_st: "Activo",
 			per_telf: "",
 			per_celular1: "",
 			per_celular2: "",
@@ -65,8 +69,20 @@ export const NewColegiados: FC = () => {
 	});
 
 	// 2. Define a submit handler.
-	const onSubmit = (values: FormColegiado) => {
-		createColegiado(values);
+	const onSubmit = async (values: FormColegiado) => {
+		const result = await createColegiado(values, id);
+
+		if (result) {
+			const { data, success, msg } = result;
+
+			if (success && data) {
+				console.log(data); // Aquí puedes acceder a los datos si la creación fue exitosa
+			} else {
+				console.log(data, success, msg); // Mensaje de error o cualquier otro mensaje
+			}
+		} else {
+			console.log("Error desconocido, no se obtuvo respuesta.");
+		}
 	};
 	return (
 		<Form {...form}>
@@ -690,7 +706,7 @@ export const NewColegiados: FC = () => {
 													className={cn(
 														"w-auto justify-between",
 														!field.value && "text-muted-foreground",
-														field.value === "HABILITADO"
+														field.value === "Habilitado"
 															? "bg-green-700"
 															: "bg-red-700"
 													)}
