@@ -2,41 +2,74 @@ import { client3 } from "@/client";
 import { FormColegiado } from "@/types"
 import { gql } from "graphql-request";
 
+export const createColegiado2 = async (values: FormColegiado, id: string) => {
+    console.log(values)
+    console.log(id)
+}
+
+interface Icreate_persona {
+    create_persona: {
+        per_id: number;
+    }
+}
+
+interface IError {
+    errors?: Error[] | undefined;
+    data?: Data;
+}
+
+interface Data {
+    create_persona: null;
+}
+
+interface Error {
+    message: string;
+    locations: Location[];
+    path: string[];
+    extensions: Extensions;
+}
+
+interface Extensions {
+    code: string;
+    stacktrace: string[];
+}
+
+interface Location {
+    line: number;
+    column: number;
+}
+
 export const createColegiado = async (values: FormColegiado, id: string) => {
 
     if (id === "new") {
-
         const queryCreate_d_examen_lab = gql`
-            mutation Create_persona($data: personaInput!) {
+            mutation Create_persona($data: personaForm!) {
                 create_persona(data: $data) {
                     per_id
                 }
             }
             `;
+
+        console.log(values)
         try {
-            const { create_persona }: {
-                create_persona: {
-                    per_id: string
-                }
-            } = await client3.request(queryCreate_d_examen_lab, { data: values });
+            const data: Icreate_persona = await client3.request(queryCreate_d_examen_lab, { data: values });
+            console.log(data)
             return {
-                data: create_persona,
+                data: data.create_persona,
                 success: true,
-                msg: 'Se ha creado el Item: ' + create_persona.per_id
+                msg: 'Se ha creado el Item: ' + data.create_persona.per_id
             }
 
         } catch (error) {
             // Verifica si el error tiene la estructura esperada
             if (error instanceof Error && 'response' in error) {
-                const { response } = error as {
-                    response: {
-                        errors: { message: string }[]
-                    }
-                };
+                console.log(error)
+                const { errors } = error as IError;
+                // console.log('Error al crear el Item: ' + errors?.map((e) => e.message).join(', '))
                 return {
                     data: null,
                     success: false,
-                    msg: response.errors[0].message
+                    msg: 'Error al crear el Item: ' + errors?.map((e) => e.message).join(', ')
                 };
             } else {
                 return {

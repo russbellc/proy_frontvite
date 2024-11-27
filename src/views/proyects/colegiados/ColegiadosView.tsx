@@ -6,14 +6,25 @@ import {
 	CardFooter,
 	CardHeader,
 } from "@/components/ui";
+import { useToast } from "@/hooks";
 import { useNavigate } from "react-router-dom";
 
 export const ColegiadosView = () => {
+	const { toast } = useToast();
 	const navigate = useNavigate(); // Hook para cambiar de página
 
 	const handleNavigate = () => {
 		navigate("/colegiados/new"); // Cambiar a la ruta deseada
 	};
+
+	const toastHandled = () => {
+		toast({
+			title: "Éxito",
+			description: "Datos guardados correctamente.",
+			status: "success",
+		});
+	};
+
 	return (
 		<div>
 			<div className="flex items-center justify-between space-y-2 px-4 pb-3 pt-2">
@@ -26,7 +37,7 @@ export const ColegiadosView = () => {
 			</div>
 			<Card>
 				<CardHeader>
-					<div className="flex items-center justify-start">
+					<div className="flex items-center justify-between">
 						<Button variant="secondary" size="sm" onClick={handleNavigate}>
 							Nuevo Colegiado
 						</Button>

@@ -31,15 +31,25 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { FormColegiado, formSchema } from "@/types";
 import { createColegiado } from "@/graphql";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks";
 
 interface Props {
 	id: string;
+}
+
+interface ToastOptions {
+	title: string;
+	description: string;
+	status: "success" | "error" | "info";
 }
 
 export const NewColegiados: FC<Props> = ({ id }) => {
 	const [open, setOpen] = useState(false);
 	const [estado, setEstado] = useState(false);
 	const [estadoCol, setEstadoCol] = useState(false);
+	const navigate = useNavigate();
+	const { toast } = useToast()
 
 	// 1. Define your form.
 	const form = useForm<FormColegiado>({
@@ -51,7 +61,7 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 			col_st: "Habilitado",
 			col_obs: "",
 			col_centro_trabajo: "",
-			per_tdoc: "1",
+			per_tdoc: 1,
 			per_sexo: "M",
 			per_nro_doc: "",
 			per_nombre: "",
@@ -70,13 +80,20 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 
 	// 2. Define a submit handler.
 	const onSubmit = async (values: FormColegiado) => {
+		// createColegiado2(values, id)
 		const result = await createColegiado(values, id);
 
 		if (result) {
 			const { data, success, msg } = result;
-
 			if (success && data) {
 				console.log(data); // Aquí puedes acceder a los datos si la creación fue exitosa
+				navigate("/colegiados/");
+				// return toast mesage sussess save data
+				toast({
+					title: "Éxito",
+					description: "Datos guardados correctamente.",
+					status: "success",
+				} as ToastOptions);
 			} else {
 				console.log(data, success, msg); // Mensaje de error o cualquier otro mensaje
 			}
@@ -84,6 +101,7 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 			console.log("Error desconocido, no se obtuvo respuesta.");
 		}
 	};
+
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
@@ -327,7 +345,6 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 										<Input
 											placeholder="Nombre Completo"
 											{...field}
-											maxLength={8}
 										/>
 									</FormControl>
 									<FormMessage />
@@ -354,7 +371,6 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 										<Input
 											placeholder="Apellido Paterno"
 											{...field}
-											maxLength={8}
 										/>
 									</FormControl>
 									<FormMessage />
@@ -381,7 +397,6 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 										<Input
 											placeholder="Apellido Materno"
 											{...field}
-											maxLength={8}
 										/>
 									</FormControl>
 									<FormMessage />

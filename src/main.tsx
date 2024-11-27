@@ -8,6 +8,7 @@ import { ApolloProvider } from "@apollo/client";
 import client1 from "./client/client1";
 import client2 from "./client/client2";
 import { client3 } from "./client";
+import { Toaster } from "./components/ui";
 
 const fetcher = async (query: string, variables?: undefined) => {
 	const requestHeaders = {
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 							}}
 						>
 							<Router />
+							<Toaster />
 						</SWRConfig>
 					</ApolloProvider>
 				</ApolloProvider>
