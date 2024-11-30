@@ -4,7 +4,7 @@ import {
 	flexRender,
 	getCoreRowModel,
 	useReactTable,
-	getPaginationRowModel,
+	// getPaginationRowModel,
 } from "@tanstack/react-table";
 
 import {
@@ -20,17 +20,26 @@ import {
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
+	onNextPage: () => void; // Función para cargar la siguiente página
+	onPreviousPage: () => void; // Función para cargar la página anterior
+	handleChangeResultsPage: () => void; // Función para cargar la página anterior
+	canNextPage: boolean; // Indica si hay más páginas disponibles
+	pageFirst: number;
 }
 
 export function DataTable<TData, TValue>({
 	columns,
 	data,
+	onNextPage,
+	onPreviousPage,
+	handleChangeResultsPage,
+	canNextPage,
+	pageFirst,
 }: DataTableProps<TData, TValue>) {
 	const table = useReactTable({
 		data,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
 	});
 
 	return (
@@ -85,23 +94,41 @@ export function DataTable<TData, TValue>({
 					</TableBody>
 				</Table>
 			</div>
-			<div className="flex items-center justify-end space-x-2 py-4">
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => table.previousPage()}
-					disabled={!table.getCanPreviousPage()}
-				>
-					Anterior
-				</Button>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => table.nextPage()}
-					disabled={!table.getCanNextPage()}
-				>
-					Siguiente
-				</Button>
+			<div className="flex items-center justify-between px-2">
+				<div>
+					<label className="mr-2">Resultados por página:</label>
+					<select
+						className="px-4 py-2 border rounded
+							text-gray-700 leading-tight focus:outline-none focus:shadow-outline
+						"
+						value={pageFirst}
+						onChange={(e) => handleChangeResultsPage(Number(e.target.value))}
+					>
+						<option value={5}>5</option>
+						<option value={10}>10</option>
+						<option value={20}>20</option>
+						<option value={50}>50</option>
+						<option value={100}>100</option>
+					</select>
+				</div>
+				<div className="flex items-center justify-end space-x-2 py-4">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={onPreviousPage}
+						disabled={!data.length}
+					>
+						Anterior
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={onNextPage}
+						disabled={!canNextPage}
+					>
+						Siguiente
+					</Button>
+				</div>
 			</div>
 		</>
 	);

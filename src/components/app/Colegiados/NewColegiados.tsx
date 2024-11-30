@@ -432,7 +432,7 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 						<FormField
 							control={form.control}
 							name="per_nacionalidad"
-							render={({ field }) => (
+							render={({ field }) => ( 
 								<FormItem>
 									<FormLabel
 										className={cn(
