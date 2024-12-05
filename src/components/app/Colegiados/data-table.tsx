@@ -22,7 +22,7 @@ interface DataTableProps<TData, TValue> {
 	data: TData[];
 	onNextPage: () => void; // Función para cargar la siguiente página
 	onPreviousPage: () => void; // Función para cargar la página anterior
-	handleChangeResultsPage: () => void; // Función para cargar la página anterior
+	handleChangeResultsPage: (newResultsPerPage: number) => void; // Función para cargar la página anterior
 	canNextPage: boolean; // Indica si hay más páginas disponibles
 	pageFirst: number;
 }
@@ -102,7 +102,7 @@ export function DataTable<TData, TValue>({
 							text-gray-700 leading-tight focus:outline-none focus:shadow-outline
 						"
 						value={pageFirst}
-						onChange={(e) => handleChangeResultsPage(Number(e.target.value))}
+						onChange={(e) => handleChangeResultsPage(parseInt(e.target.value, 10))}
 					>
 						<option value={5}>5</option>
 						<option value={10}>10</option>

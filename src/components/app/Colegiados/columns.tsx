@@ -21,6 +21,7 @@ export interface Data {
 
 export interface GetAllPersona {
 	colegiados?: Colegiado[];
+	per_id: number;
 	per_nombre: string;
 	per_appat: string;
 	per_apmat: string;
@@ -34,6 +35,31 @@ export interface Colegiado {
 }
 
 export const columns: ColumnDef<GetAllPersona>[] = [
+	{
+		id: "actions",
+		// header: "Actions",
+
+		cell: ({ row }) => {
+			const persona:GetAllPersona = row.original;
+			return (
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="ghost" className="h-8 w-8 p-0">
+							<MoreHorizontal className="h-4 w-4" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end">
+						<DropdownMenuLabel>Acciones</DropdownMenuLabel>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							onClick={() => navigator.clipboard.writeText(persona.per_id.toString())}
+						>Edit file</DropdownMenuItem>
+						<DropdownMenuItem>Delete file</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			);
+		},
+	},
 	{
 		accessorKey: "ape_nom",
 		header: "Apellidos y Nombres",
@@ -69,29 +95,6 @@ export const columns: ColumnDef<GetAllPersona>[] = [
 			const variant =
 				state === 1 ? "secondary" : state === 0 ? "destructive" : "default";
 			return <Badge variant={variant}>{state}</Badge>;
-		},
-	},
-	{
-		id: "actions",
-		// header: "Actions",
-
-		cell: ({ row }) => {
-			// const persona = row.original;
-			return (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="h-8 w-8 p-0">
-							<MoreHorizontal className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuLabel>Acciones</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>Edit file</DropdownMenuItem>
-						<DropdownMenuItem>Delete file</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			);
 		},
 	},
 ];

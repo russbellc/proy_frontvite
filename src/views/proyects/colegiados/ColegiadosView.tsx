@@ -5,24 +5,15 @@ import {
 	CardContent,
 	CardFooter,
 	CardHeader,
+	Input,
 } from "@/components/ui";
-import { useToast } from "@/hooks";
 import { useNavigate } from "react-router-dom";
 
 export const ColegiadosView = () => {
-	const { toast } = useToast();
 	const navigate = useNavigate(); // Hook para cambiar de página
 
 	const handleNavigate = () => {
 		navigate("/colegiados/new"); // Cambiar a la ruta deseada
-	};
-
-	const toastHandled = () => {
-		toast({
-			title: "Éxito",
-			description: "Datos guardados correctamente.",
-			status: "success",
-		});
 	};
 
 	return (
@@ -41,15 +32,22 @@ export const ColegiadosView = () => {
 						<Button variant="secondary" size="sm" onClick={handleNavigate}>
 							Nuevo Colegiado
 						</Button>
+						<Input
+							type="buscar"
+							placeholder="Buscar"
+							className="max-w-sm
+							 bg-background border-slate-100 dark:border-slate-800
+							"
+						/>
 					</div>
 				</CardHeader>
 				<CardContent>
 					<ListaColegiados />
 				</CardContent>
 				<CardFooter>
-					<div className="text-xs text-muted-foreground">
+					{/* <div className="text-xs text-muted-foreground">
 						Showing <strong>1-10</strong> of <strong>32</strong> products
-					</div>
+					</div> */}
 				</CardFooter>
 			</Card>
 		</div>
