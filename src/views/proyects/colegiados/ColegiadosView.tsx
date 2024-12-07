@@ -7,10 +7,20 @@ import {
 	CardHeader,
 	Input,
 } from "@/components/ui";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const ColegiadosView = () => {
 	const navigate = useNavigate(); // Hook para cambiar de página
+	const [filter, setFilter] = useState<string>("");
+	const [searchTerm, setSearchTerm] = useState<string | null>(null);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setSearchTerm(filter); // Actualizamos `searchTerm` después del debounce
+		}, 500); // 500ms de espera antes de buscar
+		return () => clearTimeout(timer); // Limpia el temporizador al desmontar o cambiar
+	}, [filter]);
 
 	const handleNavigate = () => {
 		navigate("/colegiados/new"); // Cambiar a la ruta deseada
@@ -35,14 +45,13 @@ export const ColegiadosView = () => {
 						<Input
 							type="buscar"
 							placeholder="Buscar"
-							className="max-w-sm
-							 bg-background border-slate-100 dark:border-slate-800
-							"
+							className="max-w-sm bg-background border-slate-100 dark:border-slate-800 "
+							onChange={(e) => setFilter(e.target.value)}
 						/>
 					</div>
 				</CardHeader>
 				<CardContent>
-					<ListaColegiados />
+					<ListaColegiados searchTerm={searchTerm} />
 				</CardContent>
 				<CardFooter>
 					{/* <div className="text-xs text-muted-foreground">

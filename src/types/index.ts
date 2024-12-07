@@ -30,7 +30,7 @@ export const formSchema = z.object({
         required_error: "Selecciona un estado",
     }),
     col_obs: z.string(),
-    col_centro_trabajo: z.string().nullable(),
+    col_centro_trabajo: z.string(),
     per_tdoc: z.number({
         required_error: "Selecciona un tipo de documento",
     }),
@@ -68,10 +68,10 @@ export const formSchema = z.object({
     per_correo: z.string().email({
         message: "Correo electronico invalido",
     }),
-    per_nacionalidad: z.string().nullable(),
-    per_direccion1: z.string().nullable(),
-    per_direccion2: z.string().nullable(),
-    per_lugar_nac: z.string().nullable(),
+    per_nacionalidad: z.string(),
+    per_direccion1: z.string(),
+    per_direccion2: z.string(),
+    per_lugar_nac: z.string(),
     per_fech_nac: z
         .string()
         .refine((fecha) => calcularEdad(fecha) >= 18, {
@@ -81,9 +81,9 @@ export const formSchema = z.object({
             message: "La edad máxima permitida es 90 años",
         }),
     per_st: z.string(),
-    per_telf: z.string().nullable(),
-    per_celular1: z.string().nullable(),
-    per_celular2: z.string().nullable(),
+    per_telf: z.string(),
+    per_celular1: z.string(),
+    per_celular2: z.string(),
 });
 
 export type FormColegiado = z.infer<typeof formSchema>;

@@ -37,7 +37,7 @@ export interface Colegiado {
 export const columns: ColumnDef<GetAllPersona>[] = [
 	{
 		id: "actions",
-		// header: "Actions",
+		header: "Actions",
 
 		cell: ({ row }) => {
 			const persona:GetAllPersona = row.original;
@@ -84,7 +84,7 @@ export const columns: ColumnDef<GetAllPersona>[] = [
 	},
 	{
 		accessorKey: "col_st",
-		header: "Estado",
+		header: "Condición",
 		cell: (info) => <span>{info.row.original.colegiados?.[0].col_st}</span>,
 	},
 	{
