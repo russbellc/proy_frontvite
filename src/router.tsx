@@ -25,9 +25,13 @@ export default function Router() {
 					<Route path="/colegiados" element={<ColegiadosView />} />
 					<Route path="/colegiados/:id" element={<ColegiadosDetalleView />} />
 					<Route path="/pagos" element={<EmpresaView />} />
+					<Route path="/pagos/:id" element={<EmpresaView />} />
 					<Route path="/periodos" element={<EmpresaView />} />
+					<Route path="/periodos/:id" element={<EmpresaView />} />
 					<Route path="/estados" element={<EmpresaView />} />
+					<Route path="/estados/:id" element={<EmpresaView />} />
 					<Route path="/articulos" element={<EmpresaView />} />
+					<Route path="/articulos/:id" element={<EmpresaView />} />
 					<Route path="/noticias" element={<EmpresaView />} />
 				</Route>
 				<Route element={<AuthLayout />}>
