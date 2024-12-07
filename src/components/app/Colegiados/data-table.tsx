@@ -1,4 +1,3 @@
-
 import {
 	ColumnDef,
 	flexRender,
@@ -9,6 +8,18 @@ import {
 
 import {
 	Button,
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	Drawer,
+	DrawerContent,
+	DrawerTrigger,
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
 	Table,
 	TableBody,
 	TableCell,
@@ -16,6 +27,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui";
+import useMediaQuery from "@/hooks/useMediaQuery";
+import { useEffect, useState } from "react";
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
@@ -26,6 +39,34 @@ interface DataTableProps<TData, TValue> {
 	canNextPage: boolean; // Indica si hay más páginas disponibles
 	pageFirst: number;
 }
+
+type Status = {
+	value: string;
+	label: string;
+};
+
+const pages: Status[] = [
+	{
+		value: "5",
+		label: "5",
+	},
+	{
+		value: "10",
+		label: "10",
+	},
+	{
+		value: "20",
+		label: "20",
+	},
+	{
+		value: "50",
+		label: "50",
+	},
+	{
+		value: "100",
+		label: "100",
+	},
+];
 
 export function DataTable<TData, TValue>({
 	columns,
@@ -41,6 +82,16 @@ export function DataTable<TData, TValue>({
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 	});
+	const [open, setOpen] = useState<boolean>(false);
+	const isDesktop = useMediaQuery("(min-width: 768px)");
+	const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
+
+	useEffect(() => {
+		if (selectedStatus) {
+			handleChangeResultsPage(parseInt(selectedStatus.value));
+		}
+	}, [handleChangeResultsPage, selectedStatus])
+	
 
 	return (
 		<>
@@ -54,7 +105,7 @@ export function DataTable<TData, TValue>({
 										<TableHead key={header.id}>
 											{header.isPlaceholder
 												? null
-												: flexRender(header.column.columnDef.header,header.getContext())}
+												: flexRender(header.column.columnDef.header, header.getContext())}
 										</TableHead>
 									);
 								})}
@@ -93,20 +144,62 @@ export function DataTable<TData, TValue>({
 			</div>
 			<div className="flex items-center justify-between px-2">
 				<div>
-					<label className="mr-2">Resultados por página:</label>
-					<select
+					{isDesktop ? (
+						<Popover open={open} onOpenChange={setOpen}>
+							<PopoverTrigger asChild>
+								<Button variant="outline" className="w-[150px] justify-start"
+								>
+									{selectedStatus ? (
+										<>{selectedStatus.label} Registros</>
+									) : (
+										<>{pageFirst} Registros </>
+									)}
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent className="w-[200px] p-0" align="start">
+								<StatusList
+									setOpen={setOpen}
+									setSelectedStatus={setSelectedStatus}
+								/>
+							</PopoverContent>
+						</Popover>
+					) : (
+						<Drawer open={open} onOpenChange={setOpen}>
+							<DrawerTrigger asChild>
+								<Button variant="outline" className="w-[150px] justify-start">
+									{selectedStatus ? (
+										<>{selectedStatus.label} Registros</>
+									) : (
+										<>{pageFirst} Registros </>
+									)}
+								</Button>
+							</DrawerTrigger>
+							<DrawerContent>
+								<div className="mt-4 border-t">
+									<StatusList
+										setOpen={setOpen}
+										setSelectedStatus={setSelectedStatus}
+									/>
+								</div>
+							</DrawerContent>
+						</Drawer>
+					)}
+					{/* <label className="mr-2">Resultados por página:</label> */}
+					{/* <select
 						className="px-4 py-2 border rounded
 							text-gray-700 leading-tight focus:outline-none focus:shadow-outline
 						"
 						value={pageFirst}
-						onChange={(e) => handleChangeResultsPage(parseInt(e.target.value, 10))}
+						onChange={(e) =>
+							handleChangeResultsPage(parseInt(e.target.value, 10))
+						}
 					>
 						<option value={5}>5</option>
 						<option value={10}>10</option>
 						<option value={20}>20</option>
 						<option value={50}>50</option>
 						<option value={100}>100</option>
-					</select>
+					</select> */}
 				</div>
 				<div className="flex items-center justify-end space-x-2 py-4">
 					<Button
@@ -128,5 +221,38 @@ export function DataTable<TData, TValue>({
 				</div>
 			</div>
 		</>
+	);
+}
+
+function StatusList({
+	setOpen,
+	setSelectedStatus,
+}: {
+	setOpen: (open: boolean) => void;
+	setSelectedStatus: (status: Status | null) => void;
+}) {
+	return (
+		<Command>
+			<CommandInput placeholder="Filter status..." />
+			<CommandList>
+				<CommandEmpty>No results found.</CommandEmpty>
+				<CommandGroup>
+					{pages.map((status) => (
+						<CommandItem
+							key={status.value}
+							value={status.value}
+							onSelect={(value) => {
+								setSelectedStatus(
+									pages.find((priority) => priority.value === value) || null
+								);
+								setOpen(false);
+							}}
+						>
+							{status.label}
+						</CommandItem>
+					))}
+				</CommandGroup>
+			</CommandList>
+		</Command>
 	);
 }
