@@ -1,5 +1,5 @@
-import { FC, useState } from "react";
-
+import { FC, useEffect, useState } from "react";
+import { debounce } from "lodash";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -33,9 +33,13 @@ import { FormColegiado, formSchema } from "@/types";
 import { createColegiado } from "@/graphql";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks";
+import { IdefaultValues } from "@/views/proyects/colegiados";
+import { client3 } from "@/client";
+import { gql } from "graphql-request";
 
 interface Props {
 	id: string;
+	defaultValues: IdefaultValues;
 }
 
 interface ToastOptions {
@@ -44,39 +48,77 @@ interface ToastOptions {
 	status: "success" | "error" | "info";
 }
 
-export const NewColegiados: FC<Props> = ({ id }) => {
+export const NewColegiados: FC<Props> = ({ id, defaultValues }) => {
 	const [open, setOpen] = useState(false);
 	const [estado, setEstado] = useState(false);
 	const [estadoCol, setEstadoCol] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const navigate = useNavigate();
-	const { toast } = useToast()
+	const { toast } = useToast();
 
 	// 1. Define your form.
 	const form = useForm<FormColegiado>({
 		resolver: zodResolver(formSchema),
-		defaultValues: {
-			// per_nro_doc: 0,
-			col_fecha_colegiatura: new Date(),
-			col_nro_cop: "",
-			col_st: "Habilitado",
-			col_obs: "",
-			col_centro_trabajo: "",
-			per_tdoc: 1,
-			per_sexo: "M",
-			per_nro_doc: "",
-			per_nombre: "",
-			per_appat: "",
-			per_apmat: "",
-			per_nacionalidad: "Peruano",
-			per_direccion1: "",
-			per_direccion2: "",
-			per_lugar_nac: "",
-			per_st: "Activo",
-			per_telf: "",
-			per_celular1: "",
-			per_celular2: "",
-		},
+		defaultValues,
 	});
+
+	const saveField = async (fieldName: keyof FormColegiado, value: unknown) => {
+		setSaving(true); // Mostrar indicador de guardado
+		try {
+			// console.log(`Guardando ${fieldName}: ${value}`);
+			const { update_persona } = await client3.request<{
+				update_persona?: { per_id: number };
+			}>(
+				gql`
+					mutation Update_persona(
+						$perId: Int!
+						$fieldName: String!
+						$value: String
+					) {
+						update_persona(
+							per_id: $perId
+							fieldName: $fieldName
+							value: $value
+						) {
+							per_id
+						}
+					}
+				`,
+				{
+					perId: +id, // Asegurarte de convertir `id` a número si es necesario
+					fieldName: fieldName, // Sin comillas adicionales
+					value: String(value), // Asegúrate de convertir el valor a string si es necesario
+				}
+			);
+			// await client.request(SAVE_FIELD_MUTATION, { id, fieldName, value });
+			console.log(update_persona);
+			console.log(saving);
+		} catch (error) {
+			console.error(`Error al guardar el campo ${fieldName}:`, error);
+		} finally {
+			setSaving(false); // Ocultar indicador de guardado
+		}
+	};
+
+	const debouncedSave = debounce(
+		(fieldName: keyof FormColegiado, value: unknown) => {
+			saveField(fieldName, value);
+		},
+		1000 // 500 ms de espera antes de ejecutar
+	);
+
+	useEffect(() => {
+		// Subscribirse a los cambios de todos los campos
+		if (id !== "new") {
+			const subscription = form.watch((value, { name }) => {
+				if (name) {
+					debouncedSave(name as keyof FormColegiado, value[name]);
+				}
+			});
+
+			return () => subscription.unsubscribe();
+		}
+	}, [debouncedSave, form, id]);
 
 	// 2. Define a submit handler.
 	const onSubmit = async (values: FormColegiado) => {
@@ -342,10 +384,7 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 										Nombre Completo
 									</FormLabel>
 									<FormControl>
-										<Input
-											placeholder="Nombre Completo"
-											{...field}
-										/>
+										<Input placeholder="Nombre Completo" {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -368,10 +407,7 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 										Apellido Paterno
 									</FormLabel>
 									<FormControl>
-										<Input
-											placeholder="Apellido Paterno"
-											{...field}
-										/>
+										<Input placeholder="Apellido Paterno" {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -394,10 +430,7 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 										Apellido Materno
 									</FormLabel>
 									<FormControl>
-										<Input
-											placeholder="Apellido Materno"
-											{...field}
-										/>
+										<Input placeholder="Apellido Materno" {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -432,7 +465,7 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 						<FormField
 							control={form.control}
 							name="per_nacionalidad"
-							render={({ field }) => ( 
+							render={({ field }) => (
 								<FormItem>
 									<FormLabel
 										className={cn(
@@ -822,16 +855,18 @@ export const NewColegiados: FC<Props> = ({ id }) => {
 							)}
 						/>
 					</div>
-					<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-6/6">
-						<Button
-							type="submit"
-							variant="secondary"
-							size="default"
-							className="w-full sm:w-auto"
-						>
-							Guardar
-						</Button>
-					</div>
+					{id == "new" && (
+						<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-6/6">
+							<Button
+								type="submit"
+								variant="secondary"
+								size="default"
+								className="w-full sm:w-auto"
+							>
+								Guardar
+							</Button>
+						</div>
+					)}
 				</div>
 			</form>
 		</Form>

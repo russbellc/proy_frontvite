@@ -34,13 +34,17 @@ export interface Colegiado {
 	col_st: string;
 }
 
-export const columns: ColumnDef<GetAllPersona>[] = [
+// export const columns: ColumnDef<GetAllPersona>[] = [
+
+export const columns = (
+	onNavigate: (id: number) => void
+): ColumnDef<GetAllPersona>[] => [
 	{
 		id: "actions",
 		header: "Actions",
 
 		cell: ({ row }) => {
-			const persona:GetAllPersona = row.original;
+			const persona: GetAllPersona = row.original;
 			return (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -52,8 +56,10 @@ export const columns: ColumnDef<GetAllPersona>[] = [
 						<DropdownMenuLabel>Acciones</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem
-							onClick={() => navigator.clipboard.writeText(persona.per_id.toString())}
-						>Edit file</DropdownMenuItem>
+							onClick={() => onNavigate(persona.per_id)} // Llamada a la función
+						>
+							Edit file
+						</DropdownMenuItem>
 						<DropdownMenuItem>Delete file</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

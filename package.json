@@ -32,6 +32,7 @@
     "date-fns": "^3.6.0",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.396.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
@@ -46,6 +47,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.13",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

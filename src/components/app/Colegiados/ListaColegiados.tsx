@@ -4,6 +4,8 @@ import { DataTable } from "./data-table";
 import { gql } from "graphql-request";
 import { FC, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui";
+import { useNavigate } from "react-router-dom";
+import { client3 } from "@/client";
 
 interface Persona {
 	per_id: number;
@@ -16,6 +18,35 @@ interface Persona {
 		col_nro_cop: string;
 		col_st: string;
 	}[];
+}
+
+export interface DataPersona {
+	getOne_persona: {
+		per_id: number;
+		per_tdoc: number;
+		per_nro_doc: string;
+		per_nombre: string;
+		per_appat: string;
+		per_apmat: string;
+		per_sexo: string;
+		per_correo: string;
+		per_nacionalidad: string;
+		per_direccion1: string;
+		per_direccion2: string;
+		per_lugar_nac: string;
+		per_fech_nac: Date;
+		per_st: string;
+		per_telf: string;
+		per_celular1: string;
+		per_celular2: string;
+		colegiados?: {
+			col_nro_cop: string;
+			col_fecha_colegiatura: Date;
+			col_centro_trabajo: string;
+			col_st: string;
+			col_obs: string;
+		}[];
+	};
 }
 
 interface DataQuery {
@@ -40,6 +71,7 @@ interface Props {
 }
 
 export const ListaColegiados: FC<Props> = ({ searchTerm }) => {
+	const navigate = useNavigate();
 	const [pagination, setPagination] = useState<{
 		first: number;
 		after: string | null;
@@ -61,6 +93,22 @@ export const ListaColegiados: FC<Props> = ({ searchTerm }) => {
 			history: [],
 		}));
 	}, [searchTerm]);
+
+	const handleNavigate = async (id: number) => {
+		if (id) {
+			const { getOne_persona } = await client3.request<DataPersona>(
+				gql`
+					{
+						getOne_persona(per_id: ${id}) {
+							per_id
+						}
+					}
+				`
+			);
+			if (getOne_persona == null) navigate(`/colegiados/`);
+			navigate(`/colegiados/${id}`);
+		}
+	};
 
 	const GET_POSTS_CLIENT1 = gql`
 		{
@@ -139,7 +187,7 @@ export const ListaColegiados: FC<Props> = ({ searchTerm }) => {
 	return (
 		<>
 			<DataTable
-				columns={columns}
+				columns={columns(handleNavigate)}
 				data={personas}
 				onNextPage={handleNextPage}
 				onPreviousPage={handlePreviousPage}
