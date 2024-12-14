@@ -90,8 +90,7 @@ export function DataTable<TData, TValue>({
 		if (selectedStatus) {
 			handleChangeResultsPage(parseInt(selectedStatus.value));
 		}
-	}, [handleChangeResultsPage, selectedStatus])
-	
+	}, [handleChangeResultsPage, selectedStatus]);
 
 	return (
 		<>
@@ -103,9 +102,11 @@ export function DataTable<TData, TValue>({
 								{headerGroup.headers.map((header) => {
 									return (
 										<TableHead key={header.id}>
-											{header.isPlaceholder
+											{
+												header.isPlaceholder
 												? null
-												: flexRender(header.column.columnDef.header, header.getContext())}
+												: flexRender(header.column.columnDef.header, header.getContext())
+											}
 										</TableHead>
 									);
 								})}
@@ -147,8 +148,7 @@ export function DataTable<TData, TValue>({
 					{isDesktop ? (
 						<Popover open={open} onOpenChange={setOpen}>
 							<PopoverTrigger asChild>
-								<Button variant="outline" className="w-[150px] justify-start"
-								>
+								<Button variant="outline" className="w-[150px] justify-start">
 									{selectedStatus ? (
 										<>{selectedStatus.label} Registros</>
 									) : (
@@ -217,11 +217,9 @@ function StatusList({
 }) {
 	return (
 		<Command>
-			<CommandInput placeholder="Filter status..." />
+			<CommandInput placeholder="Nro de resultados..." />
 			<CommandList>
-				<CommandEmpty>
-					No se encontraron resultados
-				</CommandEmpty>
+				<CommandEmpty>No se encontraron resultados</CommandEmpty>
 				<CommandGroup>
 					{pages.map((status) => (
 						<CommandItem
