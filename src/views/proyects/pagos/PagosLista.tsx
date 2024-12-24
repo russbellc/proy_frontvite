@@ -1,4 +1,4 @@
-import { ListaColegiados } from "@/components/app/Colegiados/ListaColegiados";
+// import { ListaColegiados } from "@/components/app/Colegiados/ListaColegiados";
 import {
 	Button,
 	Card,
@@ -31,7 +31,7 @@ export const PagosLista = () => {
 					</div>
 				</CardHeader>
 				<CardContent>
-					<ListaColegiados />
+					{/* <ListaColegiados /> */}
 				</CardContent>
 				<CardFooter>
 					<div className="text-xs text-muted-foreground">
