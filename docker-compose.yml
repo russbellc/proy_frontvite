@@ -6,4 +6,4 @@ services:
     ports:
       - "3000:80"
     environment:
-      - VITE_GRAPH_SERVER=${VITE_GRAPH_SERVER}
+      - VITE_GRAPH_SERVER=https://backend-crox.up.railway.app/
