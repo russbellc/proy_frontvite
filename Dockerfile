@@ -19,6 +19,12 @@ RUN npm run build
 # Etapa de producción
 FROM nginx:alpine
 
+# Establece la zona horaria a Lima/Perú
+RUN apk add --no-cache tzdata \
+    && cp /usr/share/zoneinfo/America/Lima /etc/localtime \
+    && echo "America/Lima" > /etc/timezone \
+    && apk del tzdata
+
 # Copia los archivos construidos desde la etapa de construcción
 COPY --from=build /app/dist /usr/share/nginx/html
 
