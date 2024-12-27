@@ -1,7 +1,6 @@
 import { calcularEdad } from "@/lib/utils";
 import { z } from "zod";
 
-
 // interface de Autenticacion
 const authSchema = z.object({
     name: z.string().min(3).max(20),
@@ -14,7 +13,7 @@ type Auth = z.infer<typeof authSchema>;
 export type UserLoginForm = Pick<Auth, 'email' | 'password'>
 
 // interface colegiado
-export const formSchema = z.object({
+export const formSchemaCole = z.object({
     col_nro_cop: z
         .string()
         .min(5, {
@@ -86,4 +85,29 @@ export const formSchema = z.object({
     per_celular2: z.string(),
 });
 
-export type FormColegiado = z.infer<typeof formSchema>;
+export type FormColegiado = z.infer<typeof formSchemaCole>;
+
+// interface de pagos
+export const formSchemaPago = z.object({
+    pago_fecha: z.date({
+        required_error: "Selecciona una fecha",
+    }),
+    pago_monto_total: z.number({
+        required_error: "Ingresa el monto total",
+    }).positive("El monto total debe ser positivo"),
+    pago_nro_boletaventa: z.string().min(1, {
+        message: "Ingresa el número de boleta/venta",
+    }),
+    pago_recibo: z.string().min(1, {
+        message: "Ingresa el recibo",
+    }),
+    pago_notas: z.string().optional(),
+    pago_aporte: z.number({
+        required_error: "Ingresa el aporte",
+    }).positive("El aporte debe ser positivo"),
+    pago_otros: z.number({
+        required_error: "Ingresa otros montos",
+    }).positive("Otros montos deben ser positivos"),
+});
+
+export type FormPago = z.infer<typeof formSchemaPago>;

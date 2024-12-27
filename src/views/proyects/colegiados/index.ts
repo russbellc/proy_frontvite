@@ -1,2 +1,2 @@
-export * from './ColegiadosDetalleView';
+export * from './Colegiados';
 export * from './ColegiadosView';

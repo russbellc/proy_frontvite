@@ -2,11 +2,6 @@ import { client3 } from "@/client";
 import { FormColegiado } from "@/types"
 import { gql } from "graphql-request";
 
-export const createColegiado2 = async (values: FormColegiado, id: string) => {
-    console.log(values)
-    console.log(id)
-}
-
 interface Icreate_persona {
     create_persona: {
         per_id: number;

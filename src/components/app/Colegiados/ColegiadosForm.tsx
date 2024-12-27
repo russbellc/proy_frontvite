@@ -29,7 +29,7 @@ import { cn, col_st, per_sexo, per_st, per_tdoc } from "@/lib/utils";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { FormColegiado, formSchema } from "@/types";
+import { FormColegiado, formSchemaCole } from "@/types";
 import { createColegiado } from "@/graphql";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks";
@@ -48,7 +48,7 @@ interface ToastOptions {
 	status: "success" | "error" | "info";
 }
 
-export const NewColegiados: FC<Props> = ({ id, defaultValues }) => {
+export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 	const [open, setOpen] = useState(false);
 	const [estado, setEstado] = useState(false);
 	const [estadoCol, setEstadoCol] = useState(false);
@@ -58,7 +58,7 @@ export const NewColegiados: FC<Props> = ({ id, defaultValues }) => {
 
 	// 1. Define your form.
 	const form = useForm<FormColegiado>({
-		resolver: zodResolver(formSchema),
+		resolver: zodResolver(formSchemaCole),
 		defaultValues,
 	});
 

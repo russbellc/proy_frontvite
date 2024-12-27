@@ -6,8 +6,8 @@ import { LoginView } from "./views/auth/LoginView";
 import { EmpresaView } from "./views/proyects/empresa/EmpresaView";
 // import { AppLayout2 } from "./layouts/dashboard/AppLayout2";
 import { AppLayout } from "./layouts/dashboard/AppLayout";
-import { ColegiadosDetalleView, ColegiadosView } from "./views/proyects/colegiados";
-import { PagosLista } from "./views/proyects/pagos";
+import { Colegiados, ColegiadosView } from "./views/proyects/colegiados";
+import { Pagos, PagosLista } from "./views/proyects/pagos";
 
 export default function Router() {
 	return (
@@ -24,9 +24,9 @@ export default function Router() {
 					<Route path="/" element={<DashboardView />} />
 					<Route path="/empresa" element={<EmpresaView />} />
 					<Route path="/colegiados" element={<ColegiadosView />} />
-					<Route path="/colegiados/:id" element={<ColegiadosDetalleView />} />
+					<Route path="/colegiados/:id" element={<Colegiados />} />
 					<Route path="/pagos" element={<PagosLista />} />
-					<Route path="/pagos/:id" element={<EmpresaView />} />
+					<Route path="/pagos/:id" element={<Pagos />} />
 					<Route path="/periodos" element={<EmpresaView />} />
 					<Route path="/periodos/:id" element={<EmpresaView />} />
 					<Route path="/estados" element={<EmpresaView />} />

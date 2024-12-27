@@ -1,5 +1,5 @@
 import { client3 } from "@/client";
-import { NewColegiados } from "@/components/app/Colegiados/NewColegiados";
+import { ColegiadosForm } from "@/components/app/Colegiados/ColegiadosForm";
 import { NewColegiadosSkeleton } from "@/components/app/Colegiados/NewColegiadosSkeleton";
 import { Card, CardContent } from "@/components/ui";
 import { gql } from "graphql-request";
@@ -57,7 +57,7 @@ export interface DataPersona {
 	};
 }
 
-export const ColegiadosDetalleView = () => {
+export const Colegiados = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState<boolean>(false);
@@ -84,13 +84,14 @@ export const ColegiadosDetalleView = () => {
 		per_celular2: "",
 	});
 
-	const fetchPersona = useCallback(async (per_id: number) => {
-		setLoading(true);
-		setError(null);
+	const fetchPersona = useCallback(
+		async (per_id: number) => {
+			setLoading(true);
+			setError(null);
 
-		try {
-			const resp = await client3.request<DataPersona>(
-				gql`
+			try {
+				const resp = await client3.request<DataPersona>(
+					gql`
 			  {
 				getOne_persona(per_id: ${per_id}) {
 				  per_tdoc
@@ -119,25 +120,27 @@ export const ColegiadosDetalleView = () => {
 				}
 			  }
 			`
-			);
-			if (resp.getOne_persona == null) navigate(`/colegiados/`);
-			if (resp.getOne_persona) {
-				const { getOne_persona } = resp;
-				const { colegiados, ...rest } = getOne_persona;
-				const colegiado = colegiados?.[0];
-				setDefaultValues((prev) => ({
-					...prev,
-					...rest,
-					...colegiado,
-				}));
+				);
+				if (resp.getOne_persona == null) navigate(`/colegiados/`);
+				if (resp.getOne_persona) {
+					const { getOne_persona } = resp;
+					const { colegiados, ...rest } = getOne_persona;
+					const colegiado = colegiados?.[0];
+					setDefaultValues((prev) => ({
+						...prev,
+						...rest,
+						...colegiado,
+					}));
+				}
+			} catch (error) {
+				setError("Error al obtener la persona.");
+				console.error("Error al obtener la persona:", error);
+			} finally {
+				setLoading(false);
 			}
-		} catch (error) {
-			setError("Error al obtener la persona.");
-			console.error("Error al obtener la persona:", error);
-		} finally {
-			setLoading(false);
-		}
-	}, [navigate]);
+		},
+		[navigate]
+	);
 
 	useEffect(() => {
 		if (id !== "new" && id != null && !isNaN(+id)) {
@@ -162,13 +165,13 @@ export const ColegiadosDetalleView = () => {
 				<CardContent>
 					<div className=" pt-5">
 						{id == "new" ? (
-							<NewColegiados id="new" defaultValues={defaultValues} />
+							<ColegiadosForm id="new" defaultValues={defaultValues} />
 						) : loading ? (
 							<NewColegiadosSkeleton />
 						) : error ? (
 							<div>Error: {error}</div>
 						) : (
-							<NewColegiados id={id ?? "new"} defaultValues={defaultValues} />
+							<ColegiadosForm id={id ?? "new"} defaultValues={defaultValues} />
 						)}
 					</div>
 				</CardContent>
