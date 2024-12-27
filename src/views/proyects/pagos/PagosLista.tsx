@@ -1,19 +1,31 @@
-// import { ListaColegiados } from "@/components/app/Colegiados/ListaColegiados";
+import { ListaPagos } from "@/components/app/Pagos/ListaPagos";
 import {
 	Button,
 	Card,
 	CardContent,
 	CardFooter,
 	CardHeader,
+	Input,
 } from "@/components/ui";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const PagosLista = () => {
 	const navigate = useNavigate(); // Hook para cambiar de página
+	const [filter, setFilter] = useState<string>("");
+	const [searchTerm, setSearchTerm] = useState<string | null>(null);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setSearchTerm(filter); // Actualizamos `searchTerm` después del debounce
+		}, 500); // 500ms de espera antes de buscar
+		return () => clearTimeout(timer); // Limpia el temporizador al desmontar o cambiar
+	}, [filter]);
 
 	const handleNavigate = () => {
-		navigate("/colegiados/new"); // Cambiar a la ruta deseada
+		navigate("/pagos/new"); // Cambiar a la ruta deseada
 	};
+
 	return (
 		<div>
 			<div className="flex items-center justify-between space-y-2 px-4 pb-3 pt-2">
@@ -24,19 +36,22 @@ export const PagosLista = () => {
 			</div>
 			<Card>
 				<CardHeader>
-					<div className="flex items-center justify-start">
+					<div className="flex items-center justify-between">
 						<Button variant="secondary" size="sm" onClick={handleNavigate}>
-							Nuevo Colegiado
+							Nuevo Pago
 						</Button>
+						<Input
+							type="buscar"
+							placeholder="Buscar"
+							className="max-w-sm bg-background border-slate-100 dark:border-slate-800"
+							onChange={(e) => setFilter(e.target.value)}
+						/>
 					</div>
 				</CardHeader>
 				<CardContent>
-					{/* <ListaColegiados /> */}
+					<ListaPagos searchTerm={searchTerm} />
 				</CardContent>
 				<CardFooter>
-					<div className="text-xs text-muted-foreground">
-						Showing <strong>1-10</strong> of <strong>32</strong> products
-					</div>
 				</CardFooter>
 			</Card>
 		</div>

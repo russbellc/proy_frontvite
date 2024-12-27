@@ -7,54 +7,28 @@ import { Skeleton } from "@/components/ui";
 import { useNavigate } from "react-router-dom";
 import { client3 } from "@/client";
 
-interface Persona {
-	per_id: number;
-	per_nombre: string;
-	per_appat: string;
-	per_apmat: string;
-	per_nro_doc: string;
-	per_st: string;
+interface Pago {
+	pago_id: number;
 	colegiados: {
+		persona: {
+			per_nombre: string;
+			per_appat: string;
+			per_apmat: string;
+		};
 		col_nro_cop: string;
-		col_st: string;
-	}[];
-}
-
-export interface DataPersona {
-	getOne_persona: {
-		per_id: number;
-		per_tdoc: number;
-		per_nro_doc: string;
-		per_nombre: string;
-		per_appat: string;
-		per_apmat: string;
-		per_sexo: string;
-		per_correo: string;
-		per_nacionalidad: string;
-		per_direccion1: string;
-		per_direccion2: string;
-		per_lugar_nac: string;
-		per_fech_nac: Date;
-		per_st: string;
-		per_telf: string;
-		per_celular1: string;
-		per_celular2: string;
-		colegiados?: {
-			col_nro_cop: string;
-			col_fecha_colegiatura: Date;
-			col_centro_trabajo: string;
-			col_st: string;
-			col_obs: string;
-		}[];
 	};
+	pago_monto_total: number;
+	pago_nro_boletaventa: string;
+	pago_recibo: string;
+	pago_fecha: Date;
 }
 
 interface DataQuery {
 	dataQuery: {
-		getAll_persona: {
+		getAll_pagos: {
 			edges: {
 				cursor: string;
-				node: Persona;
+				node: Pago;
 			}[];
 			pageInfo: {
 				hasNextPage: boolean;
@@ -70,7 +44,7 @@ interface Props {
 	searchTerm?: string | null;
 }
 
-export const ListaColegiados: FC<Props> = ({ searchTerm }) => {
+export const ListaPagos: FC<Props> = ({ searchTerm }) => {
 	const navigate = useNavigate();
 	const [pagination, setPagination] = useState<{
 		first: number;
@@ -96,23 +70,23 @@ export const ListaColegiados: FC<Props> = ({ searchTerm }) => {
 
 	const handleNavigate = async (id: number) => {
 		if (id) {
-			const { getOne_persona } = await client3.request<DataPersona>(
+			const { getOne_pago } = await client3.request<{ getOne_pago: Pago }>(
 				gql`
 					{
-						getOne_persona(per_id: ${id}) {
-							per_id
+						getOne_pago(pago_id: ${id}) {
+							pago_id
 						}
 					}
 				`
 			);
-			if (getOne_persona == null) navigate(`/colegiados/`);
-			navigate(`/colegiados/${id}`);
+			if (getOne_pago == null) navigate(`/pagos/`);
+			navigate(`/pagos/${id}`);
 		}
 	};
 
 	const GET_POSTS_CLIENT1 = gql`
 		{
-			getAll_persona(
+			getAll_pagos(
 				first: ${pagination.first},
 				after: ${pagination.after ? `"${pagination.after}"` : null}
 				filter: ${pagination.filter ? `"${pagination.filter}"` : null}
@@ -120,16 +94,19 @@ export const ListaColegiados: FC<Props> = ({ searchTerm }) => {
 				edges {
 					cursor
 					node {
-						per_id
-						per_nombre
-						per_appat
-						per_apmat
-						per_nro_doc
-						per_st
+						pago_id
 						colegiados {
+							persona {
+								per_nombre
+								per_appat
+								per_apmat
+							}
 							col_nro_cop
-							col_st
 						}
+						pago_monto_total
+						pago_nro_boletaventa
+						pago_recibo
+						pago_fecha
 					}
 				}
 				pageInfo {
@@ -146,9 +123,9 @@ export const ListaColegiados: FC<Props> = ({ searchTerm }) => {
 	if (isLoadingQuery) return <SkeletonTable />;
 	if (isErrorQuery) return <p>Error: {isErrorQuery}</p>;
 
-	const { getAll_persona } = dataQuery || {};
-	const personas = getAll_persona?.edges.map((edge) => edge.node) || [];
-	const pageInfo = getAll_persona?.pageInfo || {};
+	const { getAll_pagos } = dataQuery || {};
+	const pagos = getAll_pagos?.edges.map((edge) => edge.node) || [];
+	const pageInfo = getAll_pagos?.pageInfo || {};
 
 	// Manejar paginación
 	const handleNextPage = () => {
@@ -188,7 +165,7 @@ export const ListaColegiados: FC<Props> = ({ searchTerm }) => {
 		<>
 			<DataTable
 				columns={columns(handleNavigate)}
-				data={personas}
+				data={pagos}
 				onNextPage={handleNextPage}
 				onPreviousPage={handlePreviousPage}
 				canNextPage={pageInfo.hasNextPage}

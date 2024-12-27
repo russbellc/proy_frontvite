@@ -58,7 +58,7 @@ export const columns = (
 						<DropdownMenuItem
 							onClick={() => onNavigate(persona.per_id)} // Llamada a la función
 						>
-							Edit file
+							Editar
 						</DropdownMenuItem>
 						<DropdownMenuItem>Delete file</DropdownMenuItem>
 					</DropdownMenuContent>
