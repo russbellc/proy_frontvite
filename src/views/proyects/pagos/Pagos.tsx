@@ -1,7 +1,8 @@
 import { client3 } from "@/client";
-import { PagosForm } from "@/components/app/Pagos/PagosForm";
-import { NewPagosSkeleton } from "@/components/app/Pagos/NewPagosSkeleton";
+import { NewPagosSkeleton } from "@/components/app/pagos/NewPagosSkeleton";
+import { PagosForm } from "@/components/app/pagos/PagosForm";
 import { Card, CardContent } from "@/components/ui";
+import { PagosI } from "@/interfaces";
 import { gql } from "graphql-request";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,6 +15,7 @@ export interface IdefaultValues {
 	pago_notas: string;
 	pago_aporte: number;
 	pago_otros: number;
+	Pagos?: PagosI[];
 }
 
 export interface DataPago {
@@ -42,6 +44,7 @@ export const Pagos = () => {
 		pago_notas: "",
 		pago_aporte: 0,
 		pago_otros: 0,
+		Pagos: [],
 	});
 
 	const fetchPago = useCallback(

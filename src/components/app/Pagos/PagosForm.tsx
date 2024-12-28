@@ -5,6 +5,15 @@ import { useForm } from "react-hook-form";
 import {
 	Button,
 	Calendar,
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	Drawer,
+	DrawerContent,
+	DrawerTrigger,
 	Form,
 	FormControl,
 	FormField,
@@ -28,6 +37,7 @@ import { useToast } from "@/hooks";
 import { IdefaultValues } from "@/views/proyects/pagos";
 import { client3 } from "@/client";
 import { gql } from "graphql-request";
+import useMediaQuery from "@/hooks/useMediaQuery";
 
 interface Props {
 	id: string;
@@ -40,9 +50,41 @@ interface ToastOptions {
 	status: "success" | "error" | "info";
 }
 
+type Status = {
+	value: string;
+	label: string;
+};
+
+const pages: Status[] = [
+	{
+		value: "5",
+		label: "5",
+	},
+	{
+		value: "10",
+		label: "10",
+	},
+	{
+		value: "20",
+		label: "20",
+	},
+	{
+		value: "50",
+		label: "50",
+	},
+	{
+		value: "100",
+		label: "100",
+	},
+];
+
 export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 	// const [open, setOpen] = useState(false);
 	const [saving, setSaving] = useState(false);
+	
+	const [open, setOpen] = useState<boolean>(false);
+	const isDesktop = useMediaQuery("(min-width: 768px)");
+	const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 	const navigate = useNavigate();
 	const { toast } = useToast();
 
@@ -357,8 +399,90 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 							</Button>
 						</div>
 					)}
+					<div>
+						<div>
+							{isDesktop ? (
+								<Popover open={open} onOpenChange={setOpen}>
+									<PopoverTrigger asChild>
+										<Button
+											variant="outline"
+											className="w-[150px] justify-start"
+										>
+											{selectedStatus ? (
+												<>{selectedStatus.label} Registros</>
+											) : (
+												<> Registros </>
+											)}
+										</Button>
+									</PopoverTrigger>
+									<PopoverContent className="w-[200px] p-0" align="start">
+										<StatusList
+											setOpen={setOpen}
+											setSelectedStatus={setSelectedStatus}
+										/>
+									</PopoverContent>
+								</Popover>
+							) : (
+								<Drawer open={open} onOpenChange={setOpen}>
+									<DrawerTrigger asChild>
+										<Button
+											variant="outline"
+											className="w-[150px] justify-start"
+										>
+											{selectedStatus ? (
+												<>{selectedStatus.label} Registros</>
+											) : (
+												<> Registros </>
+											)}
+										</Button>
+									</DrawerTrigger>
+									<DrawerContent>
+										<div className="mt-4 border-t">
+											<StatusList
+												setOpen={setOpen}
+												setSelectedStatus={setSelectedStatus}
+											/>
+										</div>
+									</DrawerContent>
+								</Drawer>
+							)}
+						</div>
+					</div>
 				</div>
 			</form>
 		</Form>
 	);
 };
+
+function StatusList({
+	setOpen,
+	setSelectedStatus,
+}: {
+	setOpen: (open: boolean) => void;
+	setSelectedStatus: (status: Status | null) => void;
+}) {
+	return (
+		<Command>
+			<CommandInput placeholder="Nro de resultados..." />
+			<CommandList>
+				<CommandEmpty>No se encontraron resultados</CommandEmpty>
+				<CommandGroup>
+					{pages.map((status) => (
+						<CommandItem
+							key={status.value}
+							value={status.value}
+							onSelect={(value) => {
+								setSelectedStatus(
+									pages.find((priority) => priority.value === value) || null
+								);
+								setOpen(false);
+							}}
+						>
+							{status.label}
+						</CommandItem>
+					))}
+				</CommandGroup>
+			</CommandList>
+		</Command>
+	);
+}

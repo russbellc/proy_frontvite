@@ -46,7 +46,7 @@ export interface PagoOtro {
 }
 
 
-const aportaciones: Aportacione = [
+const aportaciones: Aportacione[] = [
 	{
 		pago_id: 1,
 		pago_colegiado: 100,
@@ -129,7 +129,7 @@ const aportaciones: Aportacione = [
 	},
 ];
 
-const pago_otros: PagoOtro = [
+const pago_otros: PagoOtro[] = [
 	{
 		pago_o_id: 1,
 		pago_o_concepto: 1,
