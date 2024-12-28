@@ -150,7 +150,7 @@ export const AppLayout = ({
 								<div className="h-full">
 									{nav.map((item, index) => (
 										<>
-											<Separator key={index} />
+											{/* <Separator key={index} /> */}
 											<SidebarItem
 												key={index}
 												padre={item.padre}
@@ -197,8 +197,13 @@ export const AppLayout = ({
 							</div>
 							<Separator />
 							<ScrollArea className="h-full">
-								<div className=" flex flex-col p-4 h-full bg-[#fafbfc] dark:bg-secondary">
-									<Outlet />
+								<div className="flex flex-col p-4 h-full bg-[#fafbfc] dark:bg-secondary">
+									<div className="flex-grow">
+										<Outlet />
+									</div>
+									<footer className="mt-auto py-4 text-center">
+										<p>© 2023 Mi Aplicación. Todos los derechos reservados.</p>
+									</footer>
 								</div>
 							</ScrollArea>
 						</div>

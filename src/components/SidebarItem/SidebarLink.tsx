@@ -34,7 +34,7 @@ export const SidebarLink = ({ isCollapsed, link }: SidebarLinkProps) => {
 					to={link.href}
 					className={cn(
 						buttonVariants({
-							variant: activePath ? "default" : "ghost",
+							variant: activePath ? "secondary" : "ghost",
 							size: "icon",
 						}),
 						"h-9 w-9",
@@ -60,7 +60,7 @@ export const SidebarLink = ({ isCollapsed, link }: SidebarLinkProps) => {
 			to={link.href}
 			className={cn(
 				buttonVariants({
-					variant: activePath ? "default" : "ghost",
+					variant: activePath ? "secondary" : "ghost",
 					size: "sm",
 				}),
 				activePath &&

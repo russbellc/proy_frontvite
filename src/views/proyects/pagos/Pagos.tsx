@@ -94,7 +94,7 @@ export const Pagos = () => {
 		<div>
 			<div className="flex items-center justify-between space-y-2 px-4 pb-3 pt-2">
 				<div>
-					<h2 className="text-2xl font-bold tracking-tight">
+					<h2 className="text-2xl font-bold tracking-tight  text-secondary-foreground">
 						{id == "new" ? "Nuevo" : "Editando"} Pago
 					</h2>
 					<p className="text-muted-foreground">

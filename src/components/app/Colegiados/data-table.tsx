@@ -102,11 +102,7 @@ export function DataTable<TData, TValue>({
 								{headerGroup.headers.map((header) => {
 									return (
 										<TableHead key={header.id}>
-											{
-												header.isPlaceholder
-												? null
-												: flexRender(header.column.columnDef.header, header.getContext())
-											}
+											{header.isPlaceholder ? null: flexRender(header.column.columnDef.header,header.getContext())}
 										</TableHead>
 									);
 								})}
@@ -148,7 +144,7 @@ export function DataTable<TData, TValue>({
 					{isDesktop ? (
 						<Popover open={open} onOpenChange={setOpen}>
 							<PopoverTrigger asChild>
-								<Button variant="outline" className="w-[150px] justify-start">
+								<Button variant="secondary" className="w-[150px] justify-start">
 									{selectedStatus ? (
 										<>{selectedStatus.label} Registros</>
 									) : (
@@ -166,7 +162,7 @@ export function DataTable<TData, TValue>({
 					) : (
 						<Drawer open={open} onOpenChange={setOpen}>
 							<DrawerTrigger asChild>
-								<Button variant="outline" className="w-[150px] justify-start">
+								<Button variant="secondary" className="w-[150px] justify-start">
 									{selectedStatus ? (
 										<>{selectedStatus.label} Registros</>
 									) : (
@@ -187,7 +183,7 @@ export function DataTable<TData, TValue>({
 				</div>
 				<div className="flex items-center justify-end space-x-2 py-4">
 					<Button
-						variant="outline"
+						variant="secondary"
 						size="sm"
 						onClick={onPreviousPage}
 						disabled={!data.length}
@@ -195,7 +191,7 @@ export function DataTable<TData, TValue>({
 						Anterior
 					</Button>
 					<Button
-						variant="outline"
+						variant="secondary"
 						size="sm"
 						onClick={onNextPage}
 						disabled={!canNextPage}
@@ -223,6 +219,7 @@ function StatusList({
 				<CommandGroup>
 					{pages.map((status) => (
 						<CommandItem
+							className="text-sm text-secondary-foreground"
 							key={status.value}
 							value={status.value}
 							onSelect={(value) => {

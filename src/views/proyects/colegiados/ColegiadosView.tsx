@@ -30,7 +30,7 @@ export const ColegiadosView = () => {
 		<div>
 			<div className="flex items-center justify-between space-y-2 px-4 pb-3 pt-2">
 				<div>
-					<h2 className="text-2xl font-bold tracking-tight">Colegiados</h2>
+					<h2 className="text-2xl font-bold tracking-tight text-secondary-foreground">Colegiados</h2>
 					<p className="text-muted-foreground">
 						Listado de colegiados del CROXCUSCO
 					</p>
@@ -45,7 +45,7 @@ export const ColegiadosView = () => {
 						<Input
 							type="buscar"
 							placeholder="Buscar"
-							className="max-w-sm bg-background border-slate-100 dark:border-slate-800 "
+							className="max-w-sm bg-accent"
 							onChange={(e) => setFilter(e.target.value)}
 						/>
 					</div>

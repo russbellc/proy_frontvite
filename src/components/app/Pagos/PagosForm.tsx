@@ -81,7 +81,7 @@ const pages: Status[] = [
 export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 	// const [open, setOpen] = useState(false);
 	const [saving, setSaving] = useState(false);
-	
+
 	const [open, setOpen] = useState<boolean>(false);
 	const isDesktop = useMediaQuery("(min-width: 768px)");
 	const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
@@ -249,6 +249,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 										<Input
 											type="number"
 											step="0.01"
+											className="bg-accent"
 											placeholder="Monto Total"
 											{...field}
 										/>

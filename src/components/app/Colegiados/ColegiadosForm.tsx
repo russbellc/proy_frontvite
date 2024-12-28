@@ -167,7 +167,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										<PopoverTrigger asChild>
 											<FormControl>
 												<Button
-													variant="outline"
+													variant="secondary"
 													role="combobox"
 													aria-expanded={open}
 													className={cn(
@@ -194,6 +194,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 													<CommandGroup>
 														{per_tdoc.map((doc) => (
 															<CommandItem
+																className="text-sm text-secondary-foreground"
 																value={doc.label}
 																key={doc.value}
 																onSelect={() => {
@@ -242,6 +243,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 											placeholder="Nro de Documento"
 											{...field}
 											maxLength={12}
+											className="bg-accent"
 										/>
 									</FormControl>
 									<FormMessage />
@@ -265,7 +267,12 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Nro. COP
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Nro COP" {...field} maxLength={8} />
+										<Input
+											placeholder="Nro COP"
+											{...field}
+											maxLength={8}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -291,7 +298,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										<PopoverTrigger asChild>
 											<FormControl>
 												<Button
-													variant={"outline"}
+													variant={"secondary"}
 													className={cn(
 														"w-auto pl-3 text-left font-normal",
 														!field.value && "text-muted-foreground"
@@ -384,7 +391,11 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Nombre Completo
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Nombre Completo" {...field} />
+										<Input
+											placeholder="Nombre Completo"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -407,7 +418,11 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Apellido Paterno
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Apellido Paterno" {...field} />
+										<Input
+											placeholder="Apellido Paterno"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -430,7 +445,11 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Apellido Materno
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Apellido Materno" {...field} />
+										<Input
+											placeholder="Apellido Materno"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -453,7 +472,11 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Correo Electrónico
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Correo Electrónico" {...field} />
+										<Input
+											placeholder="Correo Electrónico"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -476,7 +499,11 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Nacionalidad
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Nacionalidad" {...field} />
+										<Input
+											placeholder="Nacionalidad"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -499,7 +526,11 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Dirección 1
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Dirección" {...field} />
+										<Input
+											placeholder="Dirección"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -522,7 +553,11 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Dirección 2
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Dirección" {...field} />
+										<Input
+											placeholder="Dirección"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -545,7 +580,12 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Ubigeo de Nacimiento
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="070101" {...field} maxLength={6} />
+										<Input
+											placeholder="070101"
+											{...field}
+											maxLength={6}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -568,7 +608,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Fecha de nacimiento
 									</FormLabel>
 									<FormControl>
-										<Input type="date" {...field} />
+										<Input type="date" {...field} className="bg-accent" />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -594,7 +634,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										<PopoverTrigger asChild>
 											<FormControl>
 												<Button
-													variant="outline"
+													variant="secondary"
 													role="combobox"
 													aria-expanded={estado}
 													className={cn(
@@ -620,6 +660,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 													<CommandGroup>
 														{per_st.map((doc) => (
 															<CommandItem
+																className="text-sm text-secondary-foreground"
 																value={doc.label}
 																key={doc.value}
 																onSelect={() => {
@@ -668,6 +709,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 											placeholder="Número de teléfono"
 											{...field}
 											maxLength={9}
+											className="bg-accent"
 										/>
 									</FormControl>
 									<FormMessage />
@@ -695,6 +737,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 											placeholder="Número de celular"
 											{...field}
 											maxLength={9}
+											className="bg-accent"
 										/>
 									</FormControl>
 									<FormMessage />
@@ -722,6 +765,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 											placeholder="Número de celular"
 											{...field}
 											maxLength={9}
+											className="bg-accent"
 										/>
 									</FormControl>
 									<FormMessage />
@@ -748,14 +792,14 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										<PopoverTrigger asChild>
 											<FormControl>
 												<Button
-													variant="outline"
+													variant="secondary"
 													role="combobox"
 													aria-expanded={estadoCol}
 													className={cn(
 														"w-auto justify-between",
 														!field.value && "text-muted-foreground",
 														field.value === "Habilitado"
-															? "bg-green-700"
+															? "bg-lime-500"
 															: "bg-red-700"
 													)}
 												>
@@ -777,6 +821,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 													<CommandGroup>
 														{col_st.map((doc) => (
 															<CommandItem
+																className="text-sm text-secondary-foreground"
 																value={doc.label}
 																key={doc.value}
 																onSelect={() => {
@@ -821,7 +866,11 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 										Centro de trabajo
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Centro de trabajo" {...field} />
+										<Input
+											placeholder="Centro de trabajo"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -846,7 +895,7 @@ export const ColegiadosForm: FC<Props> = ({ id, defaultValues }) => {
 									<FormControl>
 										<Textarea
 											placeholder="Obserbaciones"
-											className="resize-x"
+											className="resize-x bg-accent"
 											{...field}
 										/>
 									</FormControl>
