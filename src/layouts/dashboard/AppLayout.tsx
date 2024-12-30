@@ -196,13 +196,13 @@ export const AppLayout = ({
 								</div>
 							</div>
 							<Separator />
-							<ScrollArea className="h-full">
+							<ScrollArea className="h-full bg-[#fafbfc] dark:bg-secondary">
 								<div className="flex flex-col p-4 h-full bg-[#fafbfc] dark:bg-secondary">
 									<div className="flex-grow">
 										<Outlet />
 									</div>
-									<footer className="mt-auto py-4 text-center">
-										<p>© 2023 Mi Aplicación. Todos los derechos reservados.</p>
+									<footer className="mt-auto py-4 text-center text-secondary-foreground">
+										<p>© {new Date().getFullYear()} FastMed App. Todos los derechos reservados.</p>
 									</footer>
 								</div>
 							</ScrollArea>

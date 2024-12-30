@@ -199,7 +199,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 												<Button
 													variant={"outline"}
 													className={cn(
-														"w-auto pl-3 text-left font-normal",
+														"w-auto pl-3 text-left font-normal bg-accent",
 														!field.value && "text-muted-foreground"
 													)}
 												>
@@ -275,7 +275,11 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 										Nro de Boleta/Venta
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Nro de Boleta/Venta" {...field} />
+										<Input
+											placeholder="Nro de Boleta/Venta"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -298,7 +302,11 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 										Recibo
 									</FormLabel>
 									<FormControl>
-										<Input placeholder="Recibo" {...field} />
+										<Input
+											placeholder="Recibo"
+											{...field}
+											className="bg-accent"
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -323,7 +331,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 									<FormControl>
 										<Textarea
 											placeholder="Notas"
-											className="resize-x"
+											className="resize-x bg-accent"
 											{...field}
 										/>
 									</FormControl>
@@ -351,6 +359,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 										<Input
 											type="number"
 											step="0.01"
+											className="bg-accent"
 											placeholder="Aporte"
 											{...field}
 										/>
@@ -379,6 +388,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 										<Input
 											type="number"
 											step="0.01"
+											className="bg-accent"
 											placeholder="Otros"
 											{...field}
 										/>
@@ -406,8 +416,8 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 								<Popover open={open} onOpenChange={setOpen}>
 									<PopoverTrigger asChild>
 										<Button
-											variant="outline"
-											className="w-[150px] justify-start"
+											variant="secondary"
+											className="w-[150px] justify-start bg-accent"
 										>
 											{selectedStatus ? (
 												<>{selectedStatus.label} Registros</>
@@ -427,7 +437,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 								<Drawer open={open} onOpenChange={setOpen}>
 									<DrawerTrigger asChild>
 										<Button
-											variant="outline"
+											variant="secondary"
 											className="w-[150px] justify-start"
 										>
 											{selectedStatus ? (
@@ -470,6 +480,7 @@ function StatusList({
 				<CommandGroup>
 					{pages.map((status) => (
 						<CommandItem
+							className="text-sm text-secondary-foreground"
 							key={status.value}
 							value={status.value}
 							onSelect={(value) => {

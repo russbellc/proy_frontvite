@@ -3,7 +3,6 @@ import { UserLoginForm } from "@/types";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@/components/ErrorMessage";
-import { cn } from "@/lib/utils";
 import { authenticateUser } from "@/graphql";
 
 export const LoginView = () => {
@@ -38,7 +37,7 @@ export const LoginView = () => {
 						/>
 						<h1 className=" font-bold text-2xl">FastMed App</h1>
 					</div>
-					<h1 className="text-3xl font-bold">Acceso de usuario</h1>
+					<h1 className="text-3xl font-bold text-secondary-foreground">Acceso de usuario</h1>
 					<p className="text-balance text-muted-foreground">
 						Ingrese su correo electrónico para iniciar sesión en su cuenta
 					</p>
@@ -46,10 +45,11 @@ export const LoginView = () => {
 				<form onSubmit={handleSubmit(handleLogin)} noValidate>
 					<div className="grid gap-4">
 						<div className="grid gap-2">
-							<Label htmlFor="email">Correo electrónico</Label>
+							<Label htmlFor="email" className="text-secondary-foreground">Correo electrónico</Label>
 							<Input
 								id="email"
 								type="email"
+								className="bg-accent dark:bg-slate-100"
 								placeholder="Email de Registro"
 								{...register("email", {
 									required: "El correo electrónico es obligatorio",
@@ -65,10 +65,10 @@ export const LoginView = () => {
 						</div>
 						<div className="grid gap-2">
 							<div className="flex items-center">
-								<Label htmlFor="password">Contraseña</Label>
+								<Label htmlFor="password" className="text-secondary-foreground">Contraseña</Label>
 								<Link
 									to="/forgot-password"
-									className="ml-auto inline-block text-sm underline"
+									className="ml-auto inline-block text-sm underline text-muted-foreground"
 								>
 									¿Olvidaste tu contraseña?
 								</Link>
@@ -76,6 +76,7 @@ export const LoginView = () => {
 							<Input
 								id="password"
 								type="password"
+								className="bg-accent dark:bg-slate-100"
 								placeholder="Contraseña"
 								{...register("password", {
 									required: "La contraseña es obligatoria",
@@ -91,11 +92,11 @@ export const LoginView = () => {
 						</div>
 						<Button
 							type="submit"
-							className={cn(
-								"w-full",
-								errors.email || errors.password ? "bg-gray-400" : "bg-primary",
-								"hover:bg-primary/90"
-							)}
+							variant="default"
+							// type="submit"
+								// variant="secondary"
+								size="default"
+								className="w-full sm:w-auto"
 						>
 							Iniciar sesión
 						</Button>

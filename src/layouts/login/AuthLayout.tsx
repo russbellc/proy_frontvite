@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 export const AuthLayout = () => {
 	return (
 		<>
-			<div className="w-full lg:grid lg:h-screen lg:grid-cols-2 xl:h-screen">
+			<div className="w-full lg:grid lg:h-screen lg:grid-cols-2 xl:h-screen bg-secondary">
 				<div
 					className="relative hidden h-full flex-col bg-muted p-10 lg:flex dark:border-r"
 					style={{
