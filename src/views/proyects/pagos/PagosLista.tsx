@@ -1,5 +1,5 @@
 
-import { ListaPagos } from "@/components/app/pagos/ListaPagos";
+import { ListaPagos } from "@/components/app/Pagos/ListaPagos";
 import {
 	Button,
 	Card,

@@ -1,6 +1,6 @@
 import { client3 } from "@/client";
-import { NewPagosSkeleton } from "@/components/app/pagos/NewPagosSkeleton";
-import { PagosForm } from "@/components/app/pagos/PagosForm";
+import { NewPagosSkeleton } from "@/components/app/Pagos/NewPagosSkeleton";
+import { PagosForm } from "@/components/app/Pagos/PagosForm";
 import { Card, CardContent } from "@/components/ui";
 import { PagosI } from "@/interfaces";
 import { gql } from "graphql-request";

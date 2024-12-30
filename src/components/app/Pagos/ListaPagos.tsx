@@ -1,11 +1,11 @@
 import { useQuerySWR } from "@/hooks";
-import { columns } from "./columns";
-import { DataTable } from "./data-table";
 import { gql } from "graphql-request";
 import { FC, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui";
 import { useNavigate } from "react-router-dom";
 import { client3 } from "@/client";
+import { columns } from "./columns";
+import { DataTable } from "./data-table";
 
 interface Pago {
 	pago_id: number;
