@@ -5,6 +5,12 @@ import { useForm } from "react-hook-form";
 import {
 	Button,
 	Calendar,
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
 	Command,
 	CommandEmpty,
 	CommandGroup,
@@ -79,6 +85,26 @@ const pages: Status[] = [
 ];
 
 export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
+	const [Pago, setPago] = useState([
+		{
+			aport_id: null,
+			aport_mes: 1,
+			aport_mes_desc: "Enero",
+			aport_monto: 20,
+		},
+		{
+			aport_id: null,
+			aport_mes: 2,
+			aport_mes_desc: "Febrero",
+			aport_monto: 20,
+		},
+		{
+			aport_id: null,
+			aport_mes: 3,
+			aport_mes_desc: "Marzo",
+			aport_monto: 20,
+		},
+	]);
 	// const [open, setOpen] = useState(false);
 	const [saving, setSaving] = useState(false);
 
@@ -458,6 +484,48 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 								</Drawer>
 							)}
 						</div>
+					</div>
+				</div>
+				<div>
+					<div className="flex justify-between my-5">
+						<Card className="w-full">
+							<CardHeader>
+								<CardTitle>Aporte Año: 2025</CardTitle>
+								{/* <CardDescription>Periodo 2024.</CardDescription> */}
+							</CardHeader>
+							<CardContent>
+								<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+									<FormField
+										control={form.control}
+										name="pago_recibo"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel
+													className={cn(
+														"block text-sm font-semibold",
+														!field.value && "text-muted-foreground"
+													)}
+												>
+													Recibo
+												</FormLabel>
+												<FormControl>
+													<Input
+														placeholder="Recibo"
+														{...field}
+														className="bg-accent"
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+							</CardContent>
+							<CardFooter className="flex justify-start ">
+								<Button variant="outline">Cancel</Button>
+								<Button>Deploy</Button>
+							</CardFooter>
+						</Card>
 					</div>
 				</div>
 			</form>

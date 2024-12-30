@@ -122,8 +122,8 @@ export const AppLayout = ({
 						defaultSize={defaultLayout[0]}
 						collapsedSize={navCollapsedSize}
 						collapsible={true}
-						minSize={15}
-						maxSize={20}
+						minSize={10}
+						maxSize={10}
 						onCollapse={() => {
 							console.log(isCollapsed);
 							setIsCollapsed(isCollapsed);
