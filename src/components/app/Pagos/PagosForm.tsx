@@ -11,6 +11,7 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
+	Checkbox,
 	Command,
 	CommandEmpty,
 	CommandGroup,
@@ -31,9 +32,12 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 	Textarea,
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
 } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { FormPago, formSchemaPago } from "@/types";
@@ -488,44 +492,73 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 				</div>
 				<div>
 					<div className="flex justify-between my-5">
-						<Card className="w-full">
-							<CardHeader>
+						<Collapsible className="w-full" open={open} onOpenChange={setOpen}>
+							<div className="flex items-center justify-between space-x-4 px-4">
 								<CardTitle>Aporte Año: 2025</CardTitle>
-								{/* <CardDescription>Periodo 2024.</CardDescription> */}
-							</CardHeader>
-							<CardContent>
-								<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
-									<FormField
-										control={form.control}
-										name="pago_recibo"
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel
-													className={cn(
-														"block text-sm font-semibold",
-														!field.value && "text-muted-foreground"
-													)}
-												>
-													Recibo
-												</FormLabel>
-												<FormControl>
-													<Input
-														placeholder="Recibo"
-														{...field}
-														className="bg-accent"
+								<CollapsibleTrigger asChild>
+									<Button variant="ghost" size="sm" className="w-9 p-0">
+										<ChevronsUpDown className="h-4 w-4" />
+										<span className="sr-only">Toggle</span>
+									</Button>
+								</CollapsibleTrigger>
+							</div>
+							<CollapsibleContent>
+								<CardContent>
+									<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+										{[
+											"Enero",
+											"Febrero",
+											"Marzo",
+											"Abril",
+											"Mayo",
+											"Junio",
+											"Julio",
+											"Agosto",
+											"Septiembre",
+											"Octubre",
+											"Noviembre",
+											"Diciembre",
+										].map((mes) => (
+											<div key={mes} className="border rounded-lg p-4">
+												<FormItem className="flex items-center space-x-4">
+													<Checkbox id={`terms-${mes}`} className="mt-2" />
+													<label
+														htmlFor={`terms-${mes}`}
+														className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+													>
+														{mes}
+													</label>
+													<FormField
+														control={form.control}
+														name="pago_recibo"
+														render={({ field }) => (
+															<FormControl className="flex-1">
+																<Input
+																	placeholder="Recibo"
+																	{...field}
+																	className="bg-accent"
+																/>
+															</FormControl>
+														)}
 													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</CardContent>
-							<CardFooter className="flex justify-start ">
-								<Button variant="outline">Cancel</Button>
-								<Button>Deploy</Button>
-							</CardFooter>
-						</Card>
+													<FormMessage />
+												</FormItem>
+											</div>
+										))}
+									</div>
+								</CardContent>
+								<CardFooter className="flex justify-start ">
+									<Button variant={"destructive"}>Cancelar</Button>
+									<Checkbox id={`terms-`} className="ml-4 mr-2" />
+									<label
+										htmlFor={`terms-`}
+										className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+									>
+										Seleccionar Todos
+									</label>
+								</CardFooter>
+							</CollapsibleContent>
+						</Collapsible>
 					</div>
 				</div>
 			</form>
