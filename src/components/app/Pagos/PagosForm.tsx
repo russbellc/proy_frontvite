@@ -7,8 +7,6 @@ import {
 	Calendar,
 	Card,
 	CardContent,
-	CardDescription,
-	CardFooter,
 	CardHeader,
 	CardTitle,
 	Checkbox,
@@ -32,12 +30,9 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 	Textarea,
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
 } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, ChevronsUpDown } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { FormPago, formSchemaPago } from "@/types";
@@ -117,6 +112,15 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 	const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 	const navigate = useNavigate();
 	const { toast } = useToast();
+
+	const get_periodo = gql`
+		{
+			getAll_periodos {
+				period_id
+				period_anio
+			}
+		}
+	`;
 
 	// 1. Define your form.
 	const form = useForm<FormPago>({
@@ -332,11 +336,16 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 										Recibo
 									</FormLabel>
 									<FormControl>
-										<Input
-											placeholder="Recibo"
-											{...field}
-											className="bg-accent"
-										/>
+										<div className="flex">
+											<span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
+												S/.
+											</span>
+											<Input
+												placeholder="Recibo"
+												{...field}
+												className="bg-accent rounded-l-none"
+											/>
+										</div>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -492,73 +501,77 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 				</div>
 				<div>
 					<div className="flex justify-between my-5">
-						<Collapsible className="w-full" open={open} onOpenChange={setOpen}>
-							<div className="flex items-center justify-between space-x-4 px-4">
-								<CardTitle>Aporte Año: 2025</CardTitle>
-								<CollapsibleTrigger asChild>
-									<Button variant="ghost" size="sm" className="w-9 p-0">
-										<ChevronsUpDown className="h-4 w-4" />
-										<span className="sr-only">Toggle</span>
-									</Button>
-								</CollapsibleTrigger>
-							</div>
-							<CollapsibleContent>
-								<CardContent>
-									<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-										{[
-											"Enero",
-											"Febrero",
-											"Marzo",
-											"Abril",
-											"Mayo",
-											"Junio",
-											"Julio",
-											"Agosto",
-											"Septiembre",
-											"Octubre",
-											"Noviembre",
-											"Diciembre",
-										].map((mes) => (
-											<div key={mes} className="border rounded-lg p-4">
-												<FormItem className="flex items-center space-x-4">
-													<Checkbox id={`terms-${mes}`} className="mt-2" />
-													<label
-														htmlFor={`terms-${mes}`}
-														className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-													>
-														{mes}
-													</label>
-													<FormField
-														control={form.control}
-														name="pago_recibo"
-														render={({ field }) => (
-															<FormControl className="flex-1">
+						<Card className="w-full">
+							<CardHeader>
+								<CardTitle className="flex flex-col sm:flex-row justify-between">
+									<p>Aporte Año: 2025</p>
+									<div className="flex flex-col sm:flex-row justify-start mt-2 sm:mt-0">
+										<div className="flex justify-between">
+											<Button variant={"destructive"}>Cancelar</Button>
+											<div className="flex items-center sm:mt-0 sm:ml-4">
+												<Checkbox id={`terms-`} className="mr-2" />
+												<label
+													htmlFor={`terms-`}
+													className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+												>
+													Seleccionar Todos
+												</label>
+											</div>
+										</div>
+									</div>
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+									{[
+										"Enero",
+										"Febrero",
+										"Marzo",
+										"Abril",
+										"Mayo",
+										"Junio",
+										"Julio",
+										"Agosto",
+										"Septiembre",
+										"Octubre",
+										"Noviembre",
+										"Diciembre",
+									].map((mes) => (
+										<div key={mes} className="border rounded-lg p-4">
+											<FormItem className="flex items-center space-x-4">
+												<Checkbox id={`terms-${mes}`} className="mt-2" />
+												<label
+													htmlFor={`terms-${mes}`}
+													className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+												>
+													{mes}
+												</label>
+												<FormField
+													control={form.control}
+													name="pago_recibo"
+													render={({ field }) => (
+														<FormControl className="flex-1">
+															<div className="flex">
+																<span className="inline-flex items-center px-2 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
+																	S/.
+																</span>
 																<Input
 																	placeholder="Recibo"
 																	{...field}
-																	className="bg-accent"
+																	className="bg-accent rounded-l-none"
 																/>
-															</FormControl>
-														)}
-													/>
-													<FormMessage />
-												</FormItem>
-											</div>
-										))}
-									</div>
-								</CardContent>
-								<CardFooter className="flex justify-start ">
-									<Button variant={"destructive"}>Cancelar</Button>
-									<Checkbox id={`terms-`} className="ml-4 mr-2" />
-									<label
-										htmlFor={`terms-`}
-										className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-									>
-										Seleccionar Todos
-									</label>
-								</CardFooter>
-							</CollapsibleContent>
-						</Collapsible>
+															</div>
+														</FormControl>
+													)}
+												/>
+												<FormMessage />
+											</FormItem>
+										</div>
+									))}
+								</div>
+							</CardContent>
+							{/* <CardFooter className="flex justify-start "></CardFooter> */}
+						</Card>
 					</div>
 				</div>
 			</form>
