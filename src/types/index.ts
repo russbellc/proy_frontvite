@@ -89,6 +89,7 @@ export type FormColegiado = z.infer<typeof formSchemaCole>;
 
 // interface de pagos
 export const formSchemaPago = z.object({
+    persona_name: z.string(),
     pago_fecha: z.date({
         required_error: "Selecciona una fecha",
     }),
