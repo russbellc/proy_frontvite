@@ -7,19 +7,6 @@ import { Skeleton } from "@/components/ui";
 import { useNavigate } from "react-router-dom";
 import { client3 } from "@/client";
 
-interface Persona {
-	per_id: number;
-	per_nombre: string;
-	per_appat: string;
-	per_apmat: string;
-	per_nro_doc: string;
-	per_st: string;
-	colegiados: {
-		col_nro_cop: string;
-		col_st: string;
-	}[];
-}
-
 export interface DataPersona {
 	getOne_persona: {
 		per_id: number;
@@ -47,6 +34,19 @@ export interface DataPersona {
 			col_obs: string;
 		}[];
 	};
+}
+
+interface Persona {
+	per_id: number;
+	per_nombre: string;
+	per_appat: string;
+	per_apmat: string;
+	per_nro_doc: string;
+	per_st: string;
+	colegiados: {
+		col_nro_cop: string;
+		col_st: string;
+	}[];
 }
 
 interface DataQuery {

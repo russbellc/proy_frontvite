@@ -13,6 +13,12 @@ export const calcularEdad = (fechaNacimiento: string): number => {
 	return edad;
 };
 
+export const capitalizeWords = (str: string) => {
+	return str
+		.toLowerCase() // Convierte todo el texto a minúsculas primero
+		.replace(/\b\w/g, char => char.toUpperCase()); // Luego capitaliza las primeras letras
+}
+
 
 type Status = {
 	value: string;

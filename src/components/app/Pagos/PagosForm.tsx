@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { debounce } from "lodash";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -31,19 +31,18 @@ import {
 	PopoverTrigger,
 	Textarea,
 } from "@/components/ui";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { capitalizeWords, cn } from "@/lib/utils";
+import { CalendarIcon, PlusIcon } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { FormPago, formSchemaPago } from "@/types";
-import { createPago } from "@/graphql";
+import { createPago, PeriodoGql, searchPersonaGql } from "@/graphql";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks";
 import { IdefaultValues } from "@/views/proyects/pagos";
 import { client3 } from "@/client";
 import { gql } from "graphql-request";
 import useMediaQuery from "@/hooks/useMediaQuery";
-import { Copy } from "lucide-react";
 import {
 	Dialog,
 	DialogClose,
@@ -52,9 +51,11 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
 	id: string;
@@ -67,83 +68,113 @@ interface ToastOptions {
 	status: "success" | "error" | "info";
 }
 
+interface IPersona {
+	per_id: number;
+	per_nombre: string;
+	per_appat: string;
+	per_apmat: string;
+	per_nro_doc: string;
+	per_st?: string;
+	colegiados: {
+		col_id: number;
+		col_nro_cop: string;
+		col_st: string;
+	}[];
+}
+
 type Status = {
 	value: string;
 	label: string;
 };
 
-const pages: Status[] = [
-	{
-		value: "5",
-		label: "5",
-	},
-	{
-		value: "10",
-		label: "10",
-	},
-	{
-		value: "20",
-		label: "20",
-	},
-	{
-		value: "50",
-		label: "50",
-	},
-	{
-		value: "100",
-		label: "100",
-	},
-];
-
 export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
-	const [Pago, setPago] = useState([
-		{
-			aport_id: null,
-			aport_mes: 1,
-			aport_mes_desc: "Enero",
-			aport_monto: 20,
-		},
-		{
-			aport_id: null,
-			aport_mes: 2,
-			aport_mes_desc: "Febrero",
-			aport_monto: 20,
-		},
-		{
-			aport_id: null,
-			aport_mes: 3,
-			aport_mes_desc: "Marzo",
-			aport_monto: 20,
-		},
-	]);
-	// const [open, setOpen] = useState(false);
+	// const [Pago, setPago] = useState([
+	// 	{
+	// 		aport_id: null,
+	// 		aport_mes: 1,
+	// 		aport_mes_desc: "Enero",
+	// 		aport_monto: 20,
+	// 	},
+	// 	{
+	// 		aport_id: null,
+	// 		aport_mes: 2,
+	// 		aport_mes_desc: "Febrero",
+	// 		aport_monto: 20,
+	// 	},
+	// 	{
+	// 		aport_id: null,
+	// 		aport_mes: 3,
+	// 		aport_mes_desc: "Marzo",
+	// 		aport_monto: 20,
+	// 	},
+	// ]);
 	const [saving, setSaving] = useState(false);
+
+	const [listaPerona, setListaPerona] = useState<IPersona[]>([]);
+	const [listaPeriodo, setListaPeriodo] = useState<
+		{ period_id: number; period_anio: number }[]
+	>([]);
 
 	const [open, setOpen] = useState<boolean>(false);
 	const isDesktop = useMediaQuery("(min-width: 768px)");
 	const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
+	const [filter, setFilter] = useState<string>("");
+	const [searchPersona, setSearchPersona] = useState<string | null>(null);
 	const navigate = useNavigate();
 	const { toast } = useToast();
 	const [dialogOpen, setDialogOpen] = useState<boolean>(true); // Estado para el Dialog inicial
 
-	const get_periodo = gql`
-		{
-			getAll_periodos {
-				period_id
-				period_anio
-			}
-		}
-	`;
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setSearchPersona(filter); // Actualizamos `searchTerm` después del debounce
+		}, 500); // 500ms de espera antes de buscar
+		return () => clearTimeout(timer); // Limpia el temporizador al desmontar o cambiar
+	}, [filter]);
 
 	useEffect(() => {
-		setOpen(true); // Abrir el Dialog al entrar en el formulario
+		// setOpen(true); // Abrir el Dialog al entrar en el formulario
+		onPeriodo();
 	}, []);
+
+	useEffect(() => {
+		onSearchPerson(searchPersona);
+	}, [searchPersona]);
 
 	// 1. Define your form.
 	const form = useForm<FormPago>({
 		resolver: zodResolver(formSchemaPago),
 		defaultValues,
 	});
+
+	const onPeriodo = async () => {
+		const periodos = await PeriodoGql();
+		if (periodos) {
+			const { data, success, msg } = periodos;
+			if (success && data) {
+				setListaPeriodo(data);
+			} else {
+				console.log(data, success, msg); // Mensaje de error o cualquier otro mensaje
+			}
+		} else {
+			console.log("Error desconocido, no se obtuvo respuesta.");
+		}
+	};
+
+	const onSearchPerson = async (value: unknown) => {
+		// createColegiado2(values, id)
+		const result = await searchPersonaGql(value);
+
+		if (result) {
+			const { data, success, msg } = result;
+			if (success && data) {
+				setListaPerona(data);
+			} else {
+				console.log(data, success, msg); // Mensaje de error o cualquier otro mensaje
+			}
+		} else {
+			console.log("Error desconocido, no se obtuvo respuesta.");
+		}
+	};
 
 	const saveField = async (fieldName: keyof FormPago, value: unknown) => {
 		setSaving(true); // Mostrar indicador de guardado
@@ -225,10 +256,26 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 		}
 	};
 
+	const handleSelectPersona = async (persona: {
+		per_nombre: string;
+		per_appat: string;
+		per_apmat: string;
+		colegiados: { col_id: number }[];
+	}) => {
+		const nombres = capitalizeWords(
+			`${persona.per_nombre} ${persona.per_appat} ${
+				persona.per_apmat ? persona.per_apmat : ""
+			}`
+		);
+		form.setValue("persona_name", nombres);
+		form.setValue("col_id", persona.colegiados[0].col_id);
+		setDialogOpen(false);
+	};
+
 	return (
 		<>
 			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-				<DialogContent className="sm:max-w-md">
+				<DialogContent className="sm:max-w-md light:bg-white">
 					<DialogHeader>
 						<DialogTitle>Buscar Colegiado</DialogTitle>
 						<DialogDescription>
@@ -240,17 +287,46 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 							<Label htmlFor="search" className="sr-only">
 								Buscar
 							</Label>
-							<Input id="search" placeholder="Buscar colegiado..." />
+							<Input
+								id="search"
+								placeholder="Buscar colegiado..."
+								onChange={(e) => setFilter(e.target.value)}
+							/>
 						</div>
 					</div>
 					<div className="mt-4">
-						{/* Aquí iría el listado de nombres de colegiados */}
-						<ul>
-							<li>Colegiado 1</li>
-							<li>Colegiado 2</li>
-							<li>Colegiado 3</li>
-							{/* Agregar más colegiados según sea necesario */}
-						</ul>
+						<ScrollArea className="h-96 w-full rounded-md border">
+							<div className="p-4">
+								<ul>
+									{listaPerona.map((persona) => (
+										<React.Fragment key={persona.per_id}>
+											<li
+												className="cursor-pointer hover:bg-accent p-2 rounded flex items-center"
+												onClick={() => handleSelectPersona(persona)}
+											>
+												<Avatar className="mr-2">
+													<AvatarImage
+														src={`https://api.adorable.io/avatars/40/${persona.per_nro_doc}.png`}
+														alt={persona.per_nombre}
+													/>
+													<AvatarFallback>
+														{persona.per_nombre.charAt(0)}
+														{persona.per_appat.charAt(0)}
+													</AvatarFallback>
+												</Avatar>
+												{capitalizeWords(
+													`${persona.per_nombre} ${persona.per_appat} ${
+														persona.per_apmat ? persona.per_apmat : ""
+													}`
+												)}{" "}
+												- {persona.per_nro_doc}
+											</li>
+											<Separator className="my-2" />
+										</React.Fragment>
+									))}
+								</ul>
+							</div>
+						</ScrollArea>
 					</div>
 					<DialogFooter className="sm:justify-start">
 						<DialogClose asChild>
@@ -284,6 +360,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 												placeholder="Nro de Boleta/Venta"
 												{...field}
 												className="bg-accent"
+												onClick={() => setDialogOpen(true)}
 											/>
 										</FormControl>
 										<FormMessage />
@@ -291,6 +368,8 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 								)}
 							/>
 						</div>
+						{/* col_id (hidden) */}
+						<input type="hidden" {...form.register("col_id")} />
 						{/* pago_fecha */}
 						<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
 							<FormField
@@ -343,35 +422,6 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 								)}
 							/>
 						</div>
-						{/* pago_monto_total */}
-						<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
-							<FormField
-								control={form.control}
-								name="pago_monto_total"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel
-											className={cn(
-												"block text-sm font-semibold",
-												!field.value && "text-muted-foreground"
-											)}
-										>
-											Monto Total
-										</FormLabel>
-										<FormControl>
-											<Input
-												type="number"
-												step="0.01"
-												className="bg-accent"
-												placeholder="Monto Total"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
 						{/* pago_nro_boletaventa */}
 						<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
 							<FormField
@@ -412,7 +462,34 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 												!field.value && "text-muted-foreground"
 											)}
 										>
-											Recibo
+											Nro. Recibo
+										</FormLabel>
+										<FormControl>
+											<Input
+												placeholder="Nro de Boleta/Venta"
+												{...field}
+												className="bg-accent"
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+						{/* pago_monto_total */}
+						<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+							<FormField
+								control={form.control}
+								name="pago_monto_total"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel
+											className={cn(
+												"block text-sm font-semibold",
+												!field.value && "text-muted-foreground"
+											)}
+										>
+											Monto Total
 										</FormLabel>
 										<FormControl>
 											<div className="flex">
@@ -431,152 +508,74 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 								)}
 							/>
 						</div>
-						{/* pago_notas */}
-						<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-5/6">
-							<FormField
-								control={form.control}
-								name="pago_notas"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel
-											className={cn(
-												"block text-sm font-semibold",
-												!field.value && "text-muted-foreground"
-											)}
-										>
-											Notas
-										</FormLabel>
-										<FormControl>
-											<Textarea
-												placeholder="Notas"
-												className="resize-x bg-accent"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-						{/* pago_aporte */}
-						<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
-							<FormField
-								control={form.control}
-								name="pago_aporte"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel
-											className={cn(
-												"block text-sm font-semibold",
-												!field.value && "text-muted-foreground"
-											)}
-										>
-											Aporte
-										</FormLabel>
-										<FormControl>
-											<Input
-												type="number"
-												step="0.01"
-												className="bg-accent"
-												placeholder="Aporte"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-						{/* pago_otros */}
-						<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
-							<FormField
-								control={form.control}
-								name="pago_otros"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel
-											className={cn(
-												"block text-sm font-semibold",
-												!field.value && "text-muted-foreground"
-											)}
-										>
-											Otros
-										</FormLabel>
-										<FormControl>
-											<Input
-												type="number"
-												step="0.01"
-												className="bg-accent"
-												placeholder="Otros"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-						{id == "new" && (
-							<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-6/6">
-								<Button
-									type="submit"
-									variant="secondary"
-									size="default"
-									className="w-full sm:w-auto"
-								>
-									Guardar
-								</Button>
-							</div>
-						)}
-						<div>
-							<div>
-								{isDesktop ? (
-									<Popover open={open} onOpenChange={setOpen}>
-										<PopoverTrigger asChild>
-											<Button
-												variant="secondary"
-												className="w-[150px] justify-start bg-accent"
-											>
-												{selectedStatus ? (
-													<>{selectedStatus.label} Registros</>
-												) : (
-													<> Registros </>
-												)}
-											</Button>
-										</PopoverTrigger>
-										<PopoverContent className="w-[200px] p-0" align="start">
-											<StatusList
-												setOpen={setOpen}
-												setSelectedStatus={setSelectedStatus}
-											/>
-										</PopoverContent>
-									</Popover>
-								) : (
-									<Drawer open={open} onOpenChange={setOpen}>
-										<DrawerTrigger asChild>
-											<Button
-												variant="secondary"
-												className="w-[150px] justify-start"
-											>
-												{selectedStatus ? (
-													<>{selectedStatus.label} Registros</>
-												) : (
-													<> Registros </>
-												)}
-											</Button>
-										</DrawerTrigger>
-										<DrawerContent>
-											<div className="mt-4 border-t">
+					</div>
+					<Separator className="my-4" />
+					<div className="flex flex-col gap-4 sm:flex-row sm:justify-between mt-5">
+						<p className="mr-2 text-lg font-bold">Aportaciones:</p>
+						<div className="flex items-center mt-2 sm:mt-0">
+							<div className="flex-1 sm:flex-auto sm:w-auto lg:w-auto flex items-center">
+								<div>
+									{isDesktop ? (
+										<Popover open={open} onOpenChange={setOpen}>
+											<PopoverTrigger asChild>
+												<Button
+													variant="secondary"
+													className="w-[120px] justify-start bg-accent"
+												>
+													{selectedStatus ? (
+														<>Año {selectedStatus.label}</>
+													) : (
+														<>Seleccione el Año</>
+													)}
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent className="w-[200px] p-0" align="start">
 												<StatusList
 													setOpen={setOpen}
 													setSelectedStatus={setSelectedStatus}
+													listaPeriodo={listaPeriodo}
 												/>
-											</div>
-										</DrawerContent>
-									</Drawer>
-								)}
+											</PopoverContent>
+										</Popover>
+									) : (
+										<Drawer open={open} onOpenChange={setOpen}>
+											<DrawerTrigger asChild>
+												<Button
+													variant="secondary"
+													className="w-[120px] justify-start"
+												>
+													{selectedStatus ? (
+														<>Año {selectedStatus.label}</>
+													) : (
+														<>Año</>
+													)}
+												</Button>
+											</DrawerTrigger>
+											<DrawerContent>
+												<div className="mt-4 border-t">
+													<StatusList
+														setOpen={setOpen}
+														setSelectedStatus={setSelectedStatus}
+														listaPeriodo={listaPeriodo}
+													/>
+												</div>
+											</DrawerContent>
+										</Drawer>
+									)}
+								</div>
+								<div
+									className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-gray-700 cursor-pointer"
+									// onClick={}
+								>
+									<PlusIcon className="mr-2 h-4 w-4" />
+									Añadir Periodo
+								</div>
 							</div>
 						</div>
+
+						{/* <div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-1/6">
+							
+						</div> */}
 					</div>
 					<div>
 						<div className="flex justify-between my-5">
@@ -653,6 +652,111 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 							</Card>
 						</div>
 					</div>
+					<div></div>
+					{/* notas y pagos */}
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
+						<div>
+							<p className="text-lg font-bold">Notas:</p>
+							<FormField
+								control={form.control}
+								name="pago_notas"
+								render={({ field }) => (
+									<FormItem>
+										<FormControl>
+											<Textarea
+												placeholder="Notas"
+												className="resize-x bg-accent h-32"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+						<div>
+							<p className="text-lg font-bold">Totales:</p>
+							<div className="flex flex-col space-y-2">
+								<FormField
+									control={form.control}
+									name="pago_aporte"
+									render={({ field }) => (
+										<FormItem>
+											<FormControl>
+												<div className="flex">
+													<span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md whitespace-nowrap w-48 font-bold">
+														Total Aportes
+													</span>
+													<Input
+														placeholder="Recibo"
+														{...field}
+														className="bg-accent rounded-l-none text-right"
+													/>
+												</div>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="pago_otros"
+									render={({ field }) => (
+										<FormItem>
+											<FormControl>
+												<div className="flex">
+													<span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md whitespace-nowrap w-48 font-bold">
+														Total Otros
+													</span>
+													<Input
+														placeholder="Recibo"
+														{...field}
+														className="bg-accent rounded-l-none text-right"
+													/>
+												</div>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="pago_monto_total"
+									render={({ field }) => (
+										<FormItem>
+											<FormControl>
+												<div className="flex">
+													<span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md whitespace-nowrap w-48 font-bold">
+														Total
+													</span>
+													<Input
+														placeholder="Recibo"
+														{...field}
+														className="bg-accent rounded-l-none text-right"
+													/>
+												</div>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+						</div>
+					</div>
+					<div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+						{id == "new" && (
+							<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-3/6">
+								<Button
+									type="submit"
+									variant="secondary"
+									size="default"
+									className="w-full sm:w-auto"
+								>
+									Guardar
+								</Button>
+							</div>
+						)}
+					</div>
 				</form>
 			</Form>
 		</>
@@ -662,9 +766,11 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 function StatusList({
 	setOpen,
 	setSelectedStatus,
+	listaPeriodo,
 }: {
 	setOpen: (open: boolean) => void;
 	setSelectedStatus: (status: Status | null) => void;
+	listaPeriodo: { period_id: number; period_anio: number }[];
 }) {
 	return (
 		<Command>
@@ -672,19 +778,20 @@ function StatusList({
 			<CommandList>
 				<CommandEmpty>No se encontraron resultados</CommandEmpty>
 				<CommandGroup>
-					{pages.map((status) => (
+					{listaPeriodo.map((periodo) => (
 						<CommandItem
 							className="text-sm text-secondary-foreground"
-							key={status.value}
-							value={status.value}
-							onSelect={(value) => {
-								setSelectedStatus(
-									pages.find((priority) => priority.value === value) || null
-								);
+							key={periodo.period_id}
+							value={String(periodo.period_id)}
+							onSelect={() => {
+								setSelectedStatus({
+									value: String(periodo.period_id),
+									label: String(periodo.period_anio),
+								});
 								setOpen(false);
 							}}
 						>
-							{status.label}
+							{periodo.period_anio}
 						</CommandItem>
 					))}
 				</CommandGroup>

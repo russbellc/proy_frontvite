@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 export interface IdefaultValues {
+	col_id?: number;
 	persona_name?: string;
 	pago_fecha: Date;
 	pago_monto_total: number;
