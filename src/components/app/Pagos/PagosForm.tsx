@@ -82,6 +82,33 @@ interface IPersona {
 	}[];
 }
 
+interface Pagos {
+	aportaciones: Aportacione[];
+	pago_otros: PagoOtro[];
+}
+
+interface Aportacione {
+	pago_id: number;
+	pago_colegiado: number;
+	anio: string;
+	periodo: number;
+	aporta_mes: AportaMe[];
+}
+
+interface AportaMe {
+	aport_id: null;
+	aport_mes: number;
+	aport_mes_desc: string;
+	aport_monto: number;
+}
+
+interface PagoOtro {
+	pago_o_id: number;
+	pago_o_concepto: number;
+	pago_o_desc: string;
+	pago_o_importe: number;
+}
+
 type Status = {
 	value: string;
 	label: string;
@@ -111,6 +138,104 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 	const [saving, setSaving] = useState(false);
 
 	const [listaPerona, setListaPerona] = useState<IPersona[]>([]);
+	const [listaPagos, setListaPagos] = useState<Pagos[]>([{
+		aportaciones: [
+			{
+				pago_id: 1,
+				pago_colegiado: 100,
+				anio: "2024",
+				periodo: 1,
+				aporta_mes: [
+					{
+						aport_id: null,
+						aport_mes: 1,
+						aport_mes_desc: "Enero",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 2,
+						aport_mes_desc: "Febrero",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 3,
+						aport_mes_desc: "Marzo",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 4,
+						aport_mes_desc: "Abril",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 5,
+						aport_mes_desc: "Mayo",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 6,
+						aport_mes_desc: "Junio",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 7,
+						aport_mes_desc: "Julio",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 8,
+						aport_mes_desc: "Agosto",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 9,
+						aport_mes_desc: "Septiembre",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 10,
+						aport_mes_desc: "Octubre",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 11,
+						aport_mes_desc: "Noviembre",
+						aport_monto: 20,
+					},
+					{
+						aport_id: null,
+						aport_mes: 12,
+						aport_mes_desc: "Diciembre",
+						aport_monto: 20,
+					},
+				],
+			},
+		],
+		pago_otros: [
+			{
+				pago_o_id: 1,
+				pago_o_concepto: 1,
+				pago_o_desc: "Pago de inscripción",
+				pago_o_importe: 100,
+			},
+			{
+				pago_o_id: 2,
+				pago_o_concepto: 2,
+				pago_o_desc: "Pago de multa",
+				pago_o_importe: 50,
+			},
+		],
+	}]);
 	const [listaPeriodo, setListaPeriodo] = useState<
 		{ period_id: number; period_anio: number }[]
 	>([]);
@@ -511,7 +636,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 					</div>
 					<Separator className="my-4" />
 					<div className="flex flex-col gap-4 sm:flex-row sm:justify-between mt-5">
-						<p className="mr-2 text-lg font-bold">Aportaciones:</p>
+						<p className="mr-2 text-3xl font-bold">Aportaciones:</p>
 						<div className="flex items-center mt-2 sm:mt-0">
 							<div className="flex-1 sm:flex-auto sm:w-auto lg:w-auto flex items-center">
 								<div>
@@ -578,79 +703,68 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 						</div> */}
 					</div>
 					<div>
-						<div className="flex justify-between my-5">
-							<Card className="w-full">
-								<CardHeader>
-									<CardTitle className="flex flex-col sm:flex-row justify-between">
-										<p>Aporte Año: 2025</p>
-										<div className="flex flex-col sm:flex-row justify-start mt-2 sm:mt-0">
-											<div className="flex justify-between">
-												<Button variant={"destructive"}>Cancelar</Button>
-												<div className="flex items-center sm:mt-0 sm:ml-4">
-													<Checkbox id={`terms-`} className="mr-2" />
-													<label
-														htmlFor={`terms-`}
-														className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-													>
-														Seleccionar Todos
-													</label>
+						{listaPagos[0].aportaciones.map((aporte) => (
+							<div key={aporte.pago_id} className="flex justify-between my-5">
+								<Card className="w-full">
+									<CardHeader>
+										<CardTitle className="flex flex-col sm:flex-row justify-between">
+											<p>Aporte Año: {aporte.anio}</p>
+											<div className="flex flex-col sm:flex-row justify-start mt-2 sm:mt-0">
+												<div className="flex justify-between">
+													<Button variant={"destructive"}>Cancelar</Button>
+													<div className="flex items-center sm:mt-0 sm:ml-4">
+														<Checkbox id={`terms-${aporte.pago_id}`} className="mr-2" />
+														<label
+															htmlFor={`terms-${aporte.pago_id}`}
+															className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+														>
+															Seleccionar Todos
+														</label>
+													</div>
 												</div>
 											</div>
+										</CardTitle>
+									</CardHeader>
+									<CardContent>
+										<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+											{aporte.aporta_mes.map((mes) => (
+												<div key={mes.aport_mes} className="border rounded-lg p-4">
+													<FormItem className="flex items-center space-x-4">
+														<Checkbox id={`terms-${mes.aport_mes}`} className="mt-2" />
+														<label
+															htmlFor={`terms-${mes.aport_mes}`}
+															className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+														>
+															{mes.aport_mes_desc}
+														</label>
+														<FormField
+															control={form.control}
+															name="pago_aporte"
+															render={({ field }) => (
+																<FormControl className="flex-1">
+																	<div className="flex">
+																		<span className="inline-flex items-center px-2 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
+																			S/.
+																		</span>
+																		<Input
+																			placeholder="Recibo"
+																			{...field}
+																			className="bg-accent rounded-l-none text-right"
+																			defaultValue={mes.aport_monto.toFixed(2)}
+																		/>
+																	</div>
+																</FormControl>
+															)}
+														/>
+														<FormMessage />
+													</FormItem>
+												</div>
+											))}
 										</div>
-									</CardTitle>
-								</CardHeader>
-								<CardContent>
-									<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-										{[
-											"Enero",
-											"Febrero",
-											"Marzo",
-											"Abril",
-											"Mayo",
-											"Junio",
-											"Julio",
-											"Agosto",
-											"Septiembre",
-											"Octubre",
-											"Noviembre",
-											"Diciembre",
-										].map((mes) => (
-											<div key={mes} className="border rounded-lg p-4">
-												<FormItem className="flex items-center space-x-4">
-													<Checkbox id={`terms-${mes}`} className="mt-2" />
-													<label
-														htmlFor={`terms-${mes}`}
-														className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-													>
-														{mes}
-													</label>
-													<FormField
-														control={form.control}
-														name="pago_recibo"
-														render={({ field }) => (
-															<FormControl className="flex-1">
-																<div className="flex">
-																	<span className="inline-flex items-center px-2 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
-																		S/.
-																	</span>
-																	<Input
-																		placeholder="Recibo"
-																		{...field}
-																		className="bg-accent rounded-l-none"
-																	/>
-																</div>
-															</FormControl>
-														)}
-													/>
-													<FormMessage />
-												</FormItem>
-											</div>
-										))}
-									</div>
-								</CardContent>
-								{/* <CardFooter className="flex justify-start "></CardFooter> */}
-							</Card>
-						</div>
+									</CardContent>
+								</Card>
+							</div>
+						))}
 					</div>
 					<div></div>
 					{/* notas y pagos */}
