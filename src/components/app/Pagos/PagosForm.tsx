@@ -100,6 +100,7 @@ interface AportaMe {
 	aport_mes: number;
 	aport_mes_desc: string;
 	aport_monto: number;
+	aport_st: number; // Nuevo estado
 }
 
 interface PagoOtro {
@@ -112,115 +113,16 @@ interface PagoOtro {
 type Status = {
 	value: string;
 	label: string;
+	cuota: number;
 };
 
 export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
-	// const [Pago, setPago] = useState([
-	// 	{
-	// 		aport_id: null,
-	// 		aport_mes: 1,
-	// 		aport_mes_desc: "Enero",
-	// 		aport_monto: 20,
-	// 	},
-	// 	{
-	// 		aport_id: null,
-	// 		aport_mes: 2,
-	// 		aport_mes_desc: "Febrero",
-	// 		aport_monto: 20,
-	// 	},
-	// 	{
-	// 		aport_id: null,
-	// 		aport_mes: 3,
-	// 		aport_mes_desc: "Marzo",
-	// 		aport_monto: 20,
-	// 	},
-	// ]);
 	const [saving, setSaving] = useState(false);
 
 	const [listaPerona, setListaPerona] = useState<IPersona[]>([]);
-	const [listaPagos, setListaPagos] = useState<Pagos[]>([{
-		aportaciones: [
-			{
-				pago_id: 1,
-				pago_colegiado: 100,
-				anio: "2024",
-				periodo: 1,
-				aporta_mes: [
-					{
-						aport_id: null,
-						aport_mes: 1,
-						aport_mes_desc: "Enero",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 2,
-						aport_mes_desc: "Febrero",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 3,
-						aport_mes_desc: "Marzo",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 4,
-						aport_mes_desc: "Abril",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 5,
-						aport_mes_desc: "Mayo",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 6,
-						aport_mes_desc: "Junio",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 7,
-						aport_mes_desc: "Julio",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 8,
-						aport_mes_desc: "Agosto",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 9,
-						aport_mes_desc: "Septiembre",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 10,
-						aport_mes_desc: "Octubre",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 11,
-						aport_mes_desc: "Noviembre",
-						aport_monto: 20,
-					},
-					{
-						aport_id: null,
-						aport_mes: 12,
-						aport_mes_desc: "Diciembre",
-						aport_monto: 20,
-					},
-				],
-			},
-		],
+
+	const [listaPagos, setListaPagos] = useState<Pagos>({
+		aportaciones: [],
 		pago_otros: [
 			{
 				pago_o_id: 1,
@@ -235,9 +137,9 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 				pago_o_importe: 50,
 			},
 		],
-	}]);
+	});
 	const [listaPeriodo, setListaPeriodo] = useState<
-		{ period_id: number; period_anio: number }[]
+		{ period_id: number; period_anio: number; period_cuota: number }[]
 	>([]);
 
 	const [open, setOpen] = useState<boolean>(false);
@@ -248,6 +150,12 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 	const navigate = useNavigate();
 	const { toast } = useToast();
 	const [dialogOpen, setDialogOpen] = useState<boolean>(true); // Estado para el Dialog inicial
+	const [errorDialogOpen, setErrorDialogOpen] = useState<boolean>(false);
+	const [duplicateDialogOpen, setDuplicateDialogOpen] = useState<boolean>(false);
+
+	useEffect(() => {
+		console.log(listaPagos);
+	}, [listaPagos]);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -392,10 +300,214 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 				persona.per_apmat ? persona.per_apmat : ""
 			}`
 		);
+		const newColId = persona.colegiados[0].col_id;
 		form.setValue("persona_name", nombres);
-		form.setValue("col_id", persona.colegiados[0].col_id);
+		form.setValue("col_id", newColId);
+		setListaPagos((prevListaPagos) => ({
+			...prevListaPagos,
+			aportaciones: prevListaPagos.aportaciones.map((aporte) => ({
+				...aporte,
+				pago_colegiado: newColId,
+			})),
+		}));
 		setDialogOpen(false);
 	};
+
+	const handleCheckboxChange = (
+		aporteId: number,
+		mesId: number,
+		checked: boolean
+	) => {
+		setListaPagos((prevListaPagos) => ({
+			...prevListaPagos,
+			aportaciones: prevListaPagos.aportaciones.map((aporte) =>
+				aporte.pago_id === aporteId
+					? {
+							...aporte,
+							aporta_mes: aporte.aporta_mes.map((mes) =>
+								mes.aport_mes === mesId
+									? { ...mes, aport_st: checked ? 1 : 0 }
+									: mes
+							),
+					  }
+					: aporte
+			),
+		}));
+	};
+
+	const handlePriceChange = (
+		aporteId: number,
+		mesId: number,
+		newPrice: number
+	) => {
+		setListaPagos((prevListaPagos) => ({
+			...prevListaPagos,
+			aportaciones: prevListaPagos.aportaciones.map((aporte) =>
+				aporte.pago_id === aporteId
+					? {
+							...aporte,
+							aporta_mes: aporte.aporta_mes.map((mes) =>
+								mes.aport_mes === mesId
+									? { ...mes, aport_monto: newPrice }
+									: mes
+							),
+					  }
+					: aporte
+			),
+		}));
+	};
+
+	const handleSelectAllChange = (aporteId: number, checked: boolean) => {
+		setListaPagos((prevListaPagos) => ({
+			...prevListaPagos,
+			aportaciones: prevListaPagos.aportaciones.map((aporte) =>
+				aporte.pago_id === aporteId
+					? {
+							...aporte,
+							aporta_mes: aporte.aporta_mes.map((mes) => ({
+								...mes,
+								aport_st: checked ? 1 : 0,
+							})),
+					  }
+					: aporte
+			),
+		}));
+	};
+
+	const handleCancel = (aporteId: number) => {
+		setListaPagos((prevListaPagos) => ({
+			...prevListaPagos,
+			aportaciones: prevListaPagos.aportaciones.filter(
+				(aporte) => aporte.pago_id !== aporteId
+			),
+		}));
+	};
+
+	const handleAddPeriodo = () => {
+		if (!selectedStatus || !form.getValues("col_id")) {
+			setErrorDialogOpen(true);
+			return;
+		}
+
+		const existingPeriodo = listaPagos.aportaciones.find(
+			(aporte) => aporte.anio === selectedStatus.label && aporte.periodo === parseInt(selectedStatus.value)
+		);
+
+		if (existingPeriodo) {
+			setDuplicateDialogOpen(true);
+			return;
+		}
+
+		const newAportacion = {
+			pago_id: listaPagos.aportaciones.length + 1, // Generar un nuevo ID
+			pago_colegiado: form.getValues("col_id"),
+			anio: selectedStatus.label,
+			periodo: parseInt(selectedStatus.value),
+			aporta_mes: [
+				{
+					aport_id: null,
+					aport_mes: 1,
+					aport_mes_desc: "Enero",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 2,
+					aport_mes_desc: "Febrero",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 3,
+					aport_mes_desc: "Marzo",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 4,
+					aport_mes_desc: "Abril",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 5,
+					aport_mes_desc: "Mayo",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 6,
+					aport_mes_desc: "Junio",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 7,
+					aport_mes_desc: "Julio",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 8,
+					aport_mes_desc: "Agosto",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 9,
+					aport_mes_desc: "Septiembre",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 10,
+					aport_mes_desc: "Octubre",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 11,
+					aport_mes_desc: "Noviembre",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+				{
+					aport_id: null,
+					aport_mes: 12,
+					aport_mes_desc: "Diciembre",
+					aport_monto: selectedStatus.cuota,
+					aport_st: 0,
+				},
+			],
+		};
+
+		setListaPagos((prevListaPagos) => ({
+			...prevListaPagos,
+			aportaciones: [...(prevListaPagos.aportaciones || []), newAportacion as Aportacione],
+		}));
+	};
+
+	useEffect(() => {
+		const totalAportes = listaPagos.aportaciones.reduce((total, aporte) => {
+			const totalMeses = aporte.aporta_mes.reduce((mesTotal, mes) => {
+				return mes.aport_st === 1 && mes.aport_id === null ? mesTotal + mes.aport_monto : mesTotal;
+			}, 0);
+			return total + totalMeses;
+		}, 0);
+
+		form.setValue("pago_aporte", totalAportes);
+		form.setValue("pago_monto_total", totalAportes + form.getValues("pago_otros"));
+	}, [listaPagos, form]);
 
 	return (
 		<>
@@ -456,6 +568,40 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 					<DialogFooter className="sm:justify-start">
 						<DialogClose asChild>
 							<Button type="button" variant="secondary">
+								Cerrar
+							</Button>
+						</DialogClose>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+			<Dialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+				<DialogContent className="sm:max-w-md light:bg-white">
+					<DialogHeader>
+						<DialogTitle>Alerta:</DialogTitle>
+						<DialogDescription>
+							Por favor, seleccione un Año y un Colegiado antes de añadir un periodo.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter className="sm:justify-start">
+						<DialogClose asChild>
+							<Button type="button" variant="secondary" onClick={() => setErrorDialogOpen(false)}>
+								Cerrar
+							</Button>
+						</DialogClose>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+			<Dialog open={duplicateDialogOpen} onOpenChange={setDuplicateDialogOpen}>
+				<DialogContent className="sm:max-w-md light:bg-white">
+					<DialogHeader>
+						<DialogTitle>Alerta</DialogTitle>
+						<DialogDescription>
+							Ya existe un periodo similar registrado. Por favor, seleccione un periodo diferente.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter className="sm:justify-start">
+						<DialogClose asChild>
+							<Button type="button" variant="secondary" onClick={() => setDuplicateDialogOpen(false)}>
 								Cerrar
 							</Button>
 						</DialogClose>
@@ -690,7 +836,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 								</div>
 								<div
 									className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-gray-700 cursor-pointer"
-									// onClick={}
+									onClick={handleAddPeriodo}
 								>
 									<PlusIcon className="mr-2 h-4 w-4" />
 									Añadir Periodo
@@ -703,7 +849,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 						</div> */}
 					</div>
 					<div>
-						{listaPagos[0].aportaciones.map((aporte) => (
+						{(listaPagos.aportaciones ?? []).map((aporte) => (
 							<div key={aporte.pago_id} className="flex justify-between my-5">
 								<Card className="w-full">
 									<CardHeader>
@@ -711,9 +857,20 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 											<p>Aporte Año: {aporte.anio}</p>
 											<div className="flex flex-col sm:flex-row justify-start mt-2 sm:mt-0">
 												<div className="flex justify-between">
-													<Button variant={"destructive"}>Cancelar</Button>
+													<Button
+														variant={"destructive"}
+														onClick={() => handleCancel(aporte.pago_id)}
+													>
+														Cancelar
+													</Button>
 													<div className="flex items-center sm:mt-0 sm:ml-4">
-														<Checkbox id={`terms-${aporte.pago_id}`} className="mr-2" />
+														<Checkbox
+															id={`terms-${aporte.pago_id}`}
+															className="mr-2"
+															onCheckedChange={(checked: boolean) =>
+																handleSelectAllChange(aporte.pago_id, checked)
+															}
+														/>
 														<label
 															htmlFor={`terms-${aporte.pago_id}`}
 															className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -728,9 +885,25 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 									<CardContent>
 										<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 											{aporte.aporta_mes.map((mes) => (
-												<div key={mes.aport_mes} className="border rounded-lg p-4">
+												<div
+													key={mes.aport_mes}
+													className="border rounded-lg p-4"
+												>
 													<FormItem className="flex items-center space-x-4">
-														<Checkbox id={`terms-${mes.aport_mes}`} className="mt-2" />
+														<Checkbox
+															id={`terms-${mes.aport_mes}`}
+															className="mt-2"
+															checked={mes.aport_st === 1}
+															onCheckedChange={(checked: boolean) =>
+																handleCheckboxChange(
+																	aporte.pago_id,
+																	mes.aport_mes,
+																	checked
+																)
+															
+															}
+															disabled={mes.aport_id !== null}
+														/>
 														<label
 															htmlFor={`terms-${mes.aport_mes}`}
 															className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -739,7 +912,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 														</label>
 														<FormField
 															control={form.control}
-															name="pago_aporte"
+															name={`aporte_${mes.aport_mes}`}
 															render={({ field }) => (
 																<FormControl className="flex-1">
 																	<div className="flex">
@@ -751,6 +924,21 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 																			{...field}
 																			className="bg-accent rounded-l-none text-right"
 																			defaultValue={mes.aport_monto.toFixed(2)}
+																			value={
+																				field.value as
+																					| string
+																					| number
+																					| undefined
+																			}
+																			onChange={(e) =>
+																				handlePriceChange(
+																					aporte.pago_id,
+																					mes.aport_mes,
+																					parseFloat(e.target.value)
+																				)
+																			
+																			}
+																			disabled={mes.aport_id !== null}
 																		/>
 																	</div>
 																</FormControl>
@@ -884,7 +1072,11 @@ function StatusList({
 }: {
 	setOpen: (open: boolean) => void;
 	setSelectedStatus: (status: Status | null) => void;
-	listaPeriodo: { period_id: number; period_anio: number }[];
+	listaPeriodo: {
+		period_id: number;
+		period_anio: number;
+		period_cuota: number;
+	}[];
 }) {
 	return (
 		<Command>
@@ -901,6 +1093,7 @@ function StatusList({
 								setSelectedStatus({
 									value: String(periodo.period_id),
 									label: String(periodo.period_anio),
+									cuota: periodo.period_cuota,
 								});
 								setOpen(false);
 							}}

@@ -61,6 +61,7 @@ interface IPeriodo {
         {
             period_id: number;
             period_anio: number;
+            period_cuota: number;
         }
     ]
 }
@@ -73,6 +74,7 @@ export const PeriodoGql = async () => {
 			getAll_periodos {
 				period_id
 				period_anio
+                period_cuota
 			}
 		}
     `;
