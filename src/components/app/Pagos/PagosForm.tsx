@@ -151,7 +151,9 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 	const { toast } = useToast();
 	const [dialogOpen, setDialogOpen] = useState<boolean>(true); // Estado para el Dialog inicial
 	const [errorDialogOpen, setErrorDialogOpen] = useState<boolean>(false);
-	const [duplicateDialogOpen, setDuplicateDialogOpen] = useState<boolean>(false);
+	const [duplicateDialogOpen, setDuplicateDialogOpen] =
+		useState<boolean>(false);
+	const [invalidValueDialogOpen, setInvalidValueDialogOpen] = useState<boolean>(false);
 
 	useEffect(() => {
 		console.log(listaPagos);
@@ -329,7 +331,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 									? { ...mes, aport_st: checked ? 1 : 0 }
 									: mes
 							),
-					  }
+				}
 					: aporte
 			),
 		}));
@@ -351,7 +353,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 									? { ...mes, aport_monto: newPrice }
 									: mes
 							),
-					  }
+				}
 					: aporte
 			),
 		}));
@@ -368,7 +370,7 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 								...mes,
 								aport_st: checked ? 1 : 0,
 							})),
-					  }
+				}
 					: aporte
 			),
 		}));
@@ -390,7 +392,9 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 		}
 
 		const existingPeriodo = listaPagos.aportaciones.find(
-			(aporte) => aporte.anio === selectedStatus.label && aporte.periodo === parseInt(selectedStatus.value)
+			(aporte) =>
+				aporte.anio === selectedStatus.label &&
+				aporte.periodo === parseInt(selectedStatus.value)
 		);
 
 		if (existingPeriodo) {
@@ -493,20 +497,28 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 
 		setListaPagos((prevListaPagos) => ({
 			...prevListaPagos,
-			aportaciones: [...(prevListaPagos.aportaciones || []), newAportacion as Aportacione],
+			aportaciones: [
+				...(prevListaPagos.aportaciones || []),
+				newAportacion as Aportacione,
+			],
 		}));
 	};
 
 	useEffect(() => {
 		const totalAportes = listaPagos.aportaciones.reduce((total, aporte) => {
 			const totalMeses = aporte.aporta_mes.reduce((mesTotal, mes) => {
-				return mes.aport_st === 1 && mes.aport_id === null ? mesTotal + mes.aport_monto : mesTotal;
+				return mes.aport_st === 1 && mes.aport_id === null
+					? mesTotal + mes.aport_monto
+					: mesTotal;
 			}, 0);
 			return total + totalMeses;
 		}, 0);
 
 		form.setValue("pago_aporte", totalAportes);
-		form.setValue("pago_monto_total", totalAportes + form.getValues("pago_otros"));
+		form.setValue(
+			"pago_monto_total",
+			totalAportes + form.getValues("pago_otros")
+		);
 	}, [listaPagos, form]);
 
 	return (
@@ -579,12 +591,17 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 					<DialogHeader>
 						<DialogTitle>Alerta:</DialogTitle>
 						<DialogDescription>
-							Por favor, seleccione un Año y un Colegiado antes de añadir un periodo.
+							Por favor, seleccione un Año y un Colegiado antes de añadir un
+							periodo.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter className="sm:justify-start">
 						<DialogClose asChild>
-							<Button type="button" variant="secondary" onClick={() => setErrorDialogOpen(false)}>
+							<Button
+								type="button"
+								variant="secondary"
+								onClick={() => setErrorDialogOpen(false)}
+							>
 								Cerrar
 							</Button>
 						</DialogClose>
@@ -596,12 +613,34 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 					<DialogHeader>
 						<DialogTitle>Alerta</DialogTitle>
 						<DialogDescription>
-							Ya existe un periodo similar registrado. Por favor, seleccione un periodo diferente.
+							Ya existe un periodo similar registrado. Por favor, seleccione un
+							periodo diferente.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter className="sm:justify-start">
 						<DialogClose asChild>
-							<Button type="button" variant="secondary" onClick={() => setDuplicateDialogOpen(false)}>
+							<Button
+								type="button"
+								variant="secondary"
+								onClick={() => setDuplicateDialogOpen(false)}
+							>
+								Cerrar
+							</Button>
+						</DialogClose>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+			<Dialog open={invalidValueDialogOpen} onOpenChange={setInvalidValueDialogOpen}>
+				<DialogContent className="sm:max-w-md light:bg-white">
+					<DialogHeader>
+						<DialogTitle>Alerta</DialogTitle>
+						<DialogDescription>
+							Por favor, ingrese un valor numérico positivo o 0.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter className="sm:justify-start">
+						<DialogClose asChild>
+							<Button type="button" variant="secondary" onClick={() => setInvalidValueDialogOpen(false)}>
 								Cerrar
 							</Button>
 						</DialogClose>
@@ -889,10 +928,9 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 													key={mes.aport_mes}
 													className="border rounded-lg p-4"
 												>
-													<FormItem className="flex items-center space-x-4">
+													<div className="flex items-center space-x-4">
 														<Checkbox
 															id={`terms-${mes.aport_mes}`}
-															className="mt-2"
 															checked={mes.aport_st === 1}
 															onCheckedChange={(checked: boolean) =>
 																handleCheckboxChange(
@@ -900,52 +938,39 @@ export const PagosForm: FC<Props> = ({ id, defaultValues }) => {
 																	mes.aport_mes,
 																	checked
 																)
-															
 															}
 															disabled={mes.aport_id !== null}
 														/>
-														<label
+														<Label
 															htmlFor={`terms-${mes.aport_mes}`}
-															className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+															className="block text-sm font-semibold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 														>
 															{mes.aport_mes_desc}
-														</label>
-														<FormField
-															control={form.control}
-															name={`aporte_${mes.aport_mes}`}
-															render={({ field }) => (
-																<FormControl className="flex-1">
-																	<div className="flex">
-																		<span className="inline-flex items-center px-2 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
-																			S/.
-																		</span>
-																		<Input
-																			placeholder="Recibo"
-																			{...field}
-																			className="bg-accent rounded-l-none text-right"
-																			defaultValue={mes.aport_monto.toFixed(2)}
-																			value={
-																				field.value as
-																					| string
-																					| number
-																					| undefined
-																			}
-																			onChange={(e) =>
-																				handlePriceChange(
-																					aporte.pago_id,
-																					mes.aport_mes,
-																					parseFloat(e.target.value)
-																				)
-																			
-																			}
-																			disabled={mes.aport_id !== null}
-																		/>
-																	</div>
-																</FormControl>
-															)}
-														/>
-														<FormMessage />
-													</FormItem>
+														</Label>
+														<div className="flex-1">
+															<div className="flex">
+																<span className="inline-flex items-center px-2 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
+																	S/.
+																</span>
+																<Input
+																	id={`input-${mes.aport_mes}`}
+																	placeholder="Recibo"
+																	className="bg-accent rounded-l-none text-right"
+																	defaultValue={mes.aport_monto.toFixed(2)}
+																	onChange={(e) => {
+																		const value = parseFloat(e.target.value);
+																		if (!isNaN(value) && value >= 0) {
+																			handlePriceChange(aporte.pago_id, mes.aport_mes, value);
+																		} else {
+																			setInvalidValueDialogOpen(true);
+																			handlePriceChange(aporte.pago_id, mes.aport_mes, 0);
+																		}
+																	}}
+																	disabled={mes.aport_id !== null}
+																/>
+															</div>
+														</div>
+													</div>
 												</div>
 											))}
 										</div>

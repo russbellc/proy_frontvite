@@ -169,17 +169,17 @@ export const createPago = async (values: unknown, id: string) => {
     console.log(values)
     console.log(id)
     if (id === "new") {
-        const queryCreate_d_examen_lab = gql`
-                mutation Create_persona($data: personaForm!) {
-                    create_persona(data: $data) {
-                        per_id
-                    }
-                }
-                `;
+        // const queryCreate_d_examen_lab = gql`
+        //         mutation Create_persona($data: personaForm!) {
+        //             create_persona(data: $data) {
+        //                 per_id
+        //             }
+        //         }
+        //         `;
 
         console.log(values)
         try {
-            const data: Icreate_persona = await client3.request(queryCreate_d_examen_lab, { data: values });
+            const data: { create_persona: { per_id: number } } = { create_persona: { per_id: 0 } }
             console.log(data)
             return {
                 data: data.create_persona,
