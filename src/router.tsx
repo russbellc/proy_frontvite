@@ -8,6 +8,8 @@ import { EmpresaView } from "./views/proyects/empresa/EmpresaView";
 import { AppLayout } from "./layouts/dashboard/AppLayout";
 import { Colegiados, ColegiadosView } from "./views/proyects/colegiados";
 import { Pagos, PagosLista } from "./views/proyects/pagos";
+import { WebLista } from "./views/proyects/web/WebLista";
+import { NewWeb } from "./views/proyects/web/NewWeb";
 
 export default function Router() {
 	return (
@@ -31,9 +33,8 @@ export default function Router() {
 					<Route path="/periodos/:id" element={<EmpresaView />} />
 					<Route path="/estados" element={<EmpresaView />} />
 					<Route path="/estados/:id" element={<EmpresaView />} />
-					<Route path="/articulos" element={<EmpresaView />} />
-					<Route path="/articulos/:id" element={<EmpresaView />} />
-					<Route path="/noticias" element={<EmpresaView />} />
+					<Route path="/web" element={<WebLista />} />
+					<Route path="/web/:id" element={<NewWeb />} />
 				</Route>
 				<Route element={<AuthLayout />}>
 					<Route path="/auth/login" element={<LoginView />} />

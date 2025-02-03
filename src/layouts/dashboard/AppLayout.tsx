@@ -63,16 +63,10 @@ const nav: SidebarItemsProps[] = [
 		padre: "Web",
 		links: [
 			{
-				title: "Articulos",
+				title: "Publicaciones",
 				// label: "21",
-				href: "/articulos",
+				href: "/web",
 				icon: Newspaper,
-			},
-			{
-				title: "Noticias",
-				// label: "21",
-				href: "/noticias",
-				icon: Archive,
 			},
 		],
 	},
