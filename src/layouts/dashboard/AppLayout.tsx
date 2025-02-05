@@ -18,7 +18,6 @@ import {
 import { UserNav } from "@/components/UserNav";
 import { cn } from "@/lib/utils";
 import {
-	Archive,
 	BadgeCheck,
 	HandCoins,
 	LayoutDashboard,
