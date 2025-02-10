@@ -115,3 +115,31 @@ export const formSchemaPago = z.object({
 });
 
 export type FormPago = z.infer<typeof formSchemaPago>;
+
+
+// interface de web
+export const formSchemaWeb = z.object({
+    web_id: z.number(),
+    web_categoria: z.number(
+        {
+            required_error: "Selecciona una categoria",
+        }
+    ),
+    web_titulo: z.string({
+        required_error: "Ingresa un titulo",
+    }).min(5).max(100),
+    web_mini_desc: z.string({
+        required_error: "Ingresa una descripción corta",
+    }).min(5).max(100),
+    web_desc: z.string({
+        required_error: "Ingresa una descripción",
+    }).min(5).max(1000),
+    web_img: z.string({
+        required_error: "Ingresa una imagen",
+    }).url(),
+    web_st: z.number(),
+    web_usu_create: z.number(),
+    web_fecha_create: z.string(),
+});
+
+export type FormWeb = z.infer<typeof formSchemaWeb>;

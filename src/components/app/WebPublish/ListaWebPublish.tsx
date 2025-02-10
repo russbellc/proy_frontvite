@@ -169,7 +169,7 @@ export const ListaWebPublish: FC<Props> = ({ searchTerm }) => {
 		<>
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 				{web_publish.map((node) => (
-					<Card key={node.web_id}>
+					<Card key={node.web_id} className="hover:shadow-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-shadow duration-300">
 						<img
 							src={node.web_img}
 							alt={node.web_titulo}
