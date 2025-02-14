@@ -1,4 +1,6 @@
 import { client3 } from "@/client";
+import { FormWeb } from "@/types";
+import axios from "axios";
 import { gql } from "graphql-request";
 
 interface Icategoria {
@@ -71,5 +73,54 @@ export const CategoriasGql = async () => {
                 msg: 'Error desconocido.' + error
             };
         }
+    }
+}
+
+export const createWeb = async (dataForm: FormWeb, image: File) => {
+    console.log("Datos del formulario:", dataForm);
+    console.log("Archivo de imagen:", image);
+    console.log("Tipo MIME del archivo:", image.type);
+
+    // Verificar que el archivo es una imagen
+    const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!image.type || !validMimeTypes.includes(image.type)) {
+        console.error("Tipo de archivo no válido:", image.type);
+        return {
+            data: null,
+            success: false,
+            msg: 'Invalid file type. Only images are allowed.'
+        };
+    }
+
+    const formData = new FormData();
+    formData.append("file", image);
+
+    try {
+        console.log("Enviando solicitud de subida de archivo...");
+        const uploadResponse = await axios.post('http://localhost:4000/api/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            withCredentials: true, // Asegúrate de incluir las credenciales si es necesario
+        });
+
+        console.log("Respuesta de la subida de archivo:", uploadResponse.data);
+
+        if (uploadResponse.data.fileUrl) {
+            dataForm.web_img = uploadResponse.data.fileUrl; // Actualiza la URL de la imagen en los datos del formulario
+        }
+
+        return {
+            data: dataForm,
+            success: true,
+            msg: 'Imagen subida correctamente'
+        };
+    } catch (error) {
+        console.error('Error al subir el archivo:', error);
+        return {
+            data: null,
+            success: false,
+            msg: 'Error al subir el archivo: ' + (error instanceof Error ? error.message : 'Unknown error')
+        };
     }
 }

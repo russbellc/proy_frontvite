@@ -12,13 +12,23 @@ import {
 	Input,
 	Textarea,
 	Switch,
+	Button,
 } from "@/components/ui";
-import { CategoriasGql } from "@/graphql/WebGraph";
+import { CategoriasGql, createWeb } from "@/graphql/WebGraph";
 import { cn } from "@/lib/utils";
 import { formSchemaWeb, FormWeb } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 
 interface IdefaultValues {
 	web_id: number;
@@ -43,7 +53,7 @@ interface Icategoria {
 export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 	const [estado, setEstado] = useState(false);
 	const [categoria, setCategoria] = useState<Icategoria[]>([]);
-	const [imagePreview, setImagePreview] = useState<string | null>(null);
+	const [imagePreview, setImagePreview] = useState<File | null>(null);
 	const [cardDesc, setCardDesc] = useState({
 		web_id: 2,
 		web_img:
@@ -56,6 +66,9 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 			cat_nombre: "Cursos",
 		},
 	});
+	const [galleryImages, setGalleryImages] = useState<File[]>([]);
+	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+	const [newImage, setNewImage] = useState<File | null>(null);
 
 	useEffect(() => {
 		onCategoria();
@@ -80,7 +93,11 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 			}));
 		});
 		return () => subscription.unsubscribe();
-	}, [imagePreview, form, categoria]);
+	}, [form, categoria]);
+
+	useEffect(() => {
+		console.log(imagePreview);
+	}, [imagePreview]);
 
 	const onCategoria = async () => {
 		const categoria = await CategoriasGql();
@@ -97,15 +114,24 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 	};
 
 	const onSubmit = async (data: FormWeb) => {
-		console.log(data, id);
+		if (imagePreview) {
+			const result = await createWeb(data, imagePreview);
+			console.log(result);
+		} else {
+			console.error("No image selected");
+		}
+		// console.log(data, id)
 	};
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
+			console.log("Archivo seleccionado:", file);
+			console.log("Tipo MIME del archivo seleccionado:", file.type);
+
 			const reader = new FileReader();
 			reader.onloadend = () => {
-				setImagePreview(reader.result as string);
+				setImagePreview(file);
 				setCardDesc((prev) => ({ ...prev, web_img: reader.result as string }));
 			};
 			reader.readAsDataURL(file);
@@ -114,8 +140,51 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		}
 	};
 
+	const handleAddImage = () => {
+		if (newImage) {
+			setGalleryImages((prev) => [...prev, newImage]);
+			setNewImage(null);
+			setIsDialogOpen(false);
+		}
+	};
+
+	const handleGalleryImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			setNewImage(file);
+		}
+	};
+
 	return (
 		<>
+			<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+				<DialogContent className="sm:max-w-md light:bg-white">
+					<DialogHeader>
+						<DialogTitle>Agregar Imagen</DialogTitle>
+						<DialogDescription>
+							Selecciona una imagen para agregar a la galería.
+						</DialogDescription>
+					</DialogHeader>
+					<FormControl>
+						<Input
+							type="file"
+							className="bg-accent w-full text-accent-foreground"
+							onChange={handleGalleryImageChange}
+						/>
+					</FormControl>
+					<DialogFooter className="sm:justify-start">
+						<DialogClose asChild>
+							<Button
+								type="button"
+								variant="secondary"
+								onClick={handleAddImage}
+							>
+								Guardar Imagen
+							</Button>
+						</DialogClose>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 			<div className="w-full md:w-[70%] md:pr-2">
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)}>
@@ -285,7 +354,7 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 												{imagePreview && (
 													<div className="mt-6">
 														<img
-															src={imagePreview}
+															src={URL.createObjectURL(imagePreview)}
 															alt="Vista previa"
 															className="w-full mt-4 h-80 object-contain rounded-md border"
 														/>
@@ -294,13 +363,47 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 											</FormItem>
 										)}
 									/>
+									{id == "new" && (
+										<div className="flex-1 sm:flex-auto sm:w-1/3 lg:w-6/6">
+											<Button
+												type="submit"
+												variant="secondary"
+												size="default"
+												className="w-full sm:w-auto"
+											>
+												Guardar
+											</Button>
+										</div>
+									)}
 								</div>
 							</div>
 						</div>
 					</form>
 				</Form>
+				<div className="mt-6">
+					<h2 className="text-xl font-semibold mb-4">Galería de Imágenes</h2>
+					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+						{galleryImages.map((image, index) => (
+							<img
+								key={index}
+								src={URL.createObjectURL(image)}
+								alt={`Imagen ${index + 1}`}
+								className="w-full h-40 object-cover rounded-md border"
+							/>
+						))}
+					</div>
+					<Button
+						variant="secondary"
+						size="default"
+						className="mt-4"
+						onClick={() => setIsDialogOpen(true)}
+					>
+						Agregar Imagen
+					</Button>
+				</div>
 			</div>
 			<div className="w-full md:w-[30%] mt-5 md:block md:pl-2 md:px-1 xl:px-16">
+				<h2 className="text-xl font-semibold">Vista previa</h2>
 				<Card
 					key={cardDesc.web_id}
 					className="hover:shadow-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-shadow duration-300"
