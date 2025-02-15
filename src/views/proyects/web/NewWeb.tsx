@@ -1,6 +1,6 @@
 import { WebForm } from "@/components/app/WebPublish/WebForm";
 import { Card, CardContent } from "@/components/ui";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 interface IdefaultValues {
@@ -28,6 +28,22 @@ export const NewWeb: FC = () => {
 		web_usu_create: 0,
 		web_fecha_create: "",
 	});
+
+	useEffect(() => {
+		const data: IdefaultValues = {
+			web_id: 0,
+			web_categoria: 0,
+			web_titulo: "",
+			web_mini_desc: "",
+			web_desc: "",
+			web_img: "",
+			web_st: 1,
+			web_usu_create: 0,
+			web_fecha_create: "",
+		}
+		setDefaultValues(data)
+	}, [])
+	
 	return (
 		<div>
 			<div className="flex items-center justify-between space-y-2 px-4 pb-3 pt-2">
