@@ -69,6 +69,7 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 	const [galleryImages, setGalleryImages] = useState<File[]>([]);
 	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 	const [newImage, setNewImage] = useState<File | null>(null);
+	const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
 
 	useEffect(() => {
 		onCategoria();
@@ -144,6 +145,7 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		if (newImage) {
 			setGalleryImages((prev) => [...prev, newImage]);
 			setNewImage(null);
+			setNewImagePreview(null);
 			setIsDialogOpen(false);
 		}
 	};
@@ -152,6 +154,11 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		const file = e.target.files?.[0];
 		if (file) {
 			setNewImage(file);
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setNewImagePreview(reader.result as string);
+			};
+			reader.readAsDataURL(file);
 		}
 	};
 
@@ -165,13 +172,22 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 							Selecciona una imagen para agregar a la galería.
 						</DialogDescription>
 					</DialogHeader>
-					<FormControl>
+					<div>
 						<Input
 							type="file"
 							className="bg-accent w-full text-accent-foreground"
 							onChange={handleGalleryImageChange}
-						/>
-					</FormControl>
+							/>
+						{newImagePreview && (
+							<div className="mt-4">
+								<img
+									src={newImagePreview}
+									alt="Vista previa"
+									className="w-full h-40 object-cover rounded-md border"
+								/>
+							</div>
+						)}
+					</div>
 					<DialogFooter className="sm:justify-start">
 						<DialogClose asChild>
 							<Button
