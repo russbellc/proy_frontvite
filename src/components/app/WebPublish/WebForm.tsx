@@ -119,7 +119,7 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 
 	const onSubmit = async (data: FormWeb) => {
 		if (imagePreview) {
-			const result = await createWeb(data, imagePreview);
+			const result = await createWeb(data, imagePreview,galleryImages);
 			console.log(result);
 		} else {
 			console.error("No image selected");

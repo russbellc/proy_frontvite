@@ -138,8 +138,6 @@ export const formSchemaWeb = z.object({
         required_error: "Ingresa una imagen",
     }).url(),
     web_st: z.number(),
-    web_usu_create: z.number(),
-    web_fecha_create: z.string(),
 });
 
 export type FormWeb = z.infer<typeof formSchemaWeb>;
