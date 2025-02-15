@@ -13,6 +13,7 @@ import {
 	Textarea,
 	Switch,
 	Button,
+	ScrollArea,
 } from "@/components/ui";
 import { CategoriasGql, createWeb } from "@/graphql/WebGraph";
 import { cn } from "@/lib/utils";
@@ -68,8 +69,10 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 	});
 	const [galleryImages, setGalleryImages] = useState<File[]>([]);
 	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-	const [newImage, setNewImage] = useState<File | null>(null);
-	const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
+	const [newImages, setNewImages] = useState<File[]>([]);
+	const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
+	const [viewImageDialogOpen, setViewImageDialogOpen] = useState<boolean>(false);
+	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
 	useEffect(() => {
 		onCategoria();
@@ -141,51 +144,92 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		}
 	};
 
-	const handleAddImage = () => {
-		if (newImage) {
-			setGalleryImages((prev) => [...prev, newImage]);
-			setNewImage(null);
-			setNewImagePreview(null);
+	const handleAddImages = () => {
+		if (newImages.length > 0) {
+			setGalleryImages((prev) => [...prev, ...newImages]);
+			setNewImages([]);
+			setNewImagePreviews([]);
 			setIsDialogOpen(false);
 		}
 	};
 
-	const handleGalleryImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (file) {
-			setNewImage(file);
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setNewImagePreview(reader.result as string);
-			};
-			reader.readAsDataURL(file);
-		}
+	const handleGalleryImagesChange = (
+		e: React.ChangeEvent<HTMLInputElement>
+	) => {
+		const files = Array.from(e.target.files || []);
+		setNewImages(files);
+		const previews = files.map((file) => URL.createObjectURL(file));
+		setNewImagePreviews(previews);
+	};
+
+	const handleRemoveImage = (index: number) => {
+		setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+	};
+
+	const handleViewImage = (image: string) => {
+		setSelectedImage(image);
+		setViewImageDialogOpen(true);
 	};
 
 	return (
 		<>
 			<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-				<DialogContent className="sm:max-w-md light:bg-white">
+				<DialogContent className="sm:max-w-md light:bg-white md:max-w-2xl md:max-h-max">
 					<DialogHeader>
-						<DialogTitle>Agregar Imagen</DialogTitle>
+						<DialogTitle>Agregar Imágenes</DialogTitle>
 						<DialogDescription>
-							Selecciona una imagen para agregar a la galería.
+							Selecciona imágenes para agregar a la galería.
 						</DialogDescription>
 					</DialogHeader>
 					<div>
 						<Input
 							type="file"
 							className="bg-accent w-full text-accent-foreground"
-							onChange={handleGalleryImageChange}
-							/>
-						{newImagePreview && (
+							onChange={handleGalleryImagesChange}
+							multiple
+						/>
+						<ScrollArea className="h-96 w-full rounded-md border mt-4">
 							<div className="mt-4">
-								<img
-									src={newImagePreview}
-									alt="Vista previa"
-									className="w-full h-40 object-cover rounded-md border"
-								/>
+								{newImagePreviews.length > 0 && (
+									<div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 mx-4">
+										{newImagePreviews.map((preview, index) => (
+											<img
+												key={index}
+												src={preview}
+												alt={`Vista previa ${index + 1}`}
+												className="w-full h-40 object-cover rounded-md border"
+											/>
+										))}
+									</div>
+								)}
 							</div>
+						</ScrollArea>
+					</div>
+					<DialogFooter className="sm:justify-start">
+						<DialogClose asChild>
+							<Button
+								type="button"
+								variant="secondary"
+								onClick={handleAddImages}
+							>
+								Guardar Imágenes
+							</Button>
+						</DialogClose>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+			<Dialog open={viewImageDialogOpen} onOpenChange={setViewImageDialogOpen}>
+				<DialogContent className="sm:max-w-md light:bg-white md:max-w-2xl md:max-h-max">
+					<DialogHeader>
+						<DialogTitle>Vista Previa de la Imagen</DialogTitle>
+					</DialogHeader>
+					<div className="flex justify-center items-center">
+						{selectedImage && (
+							<img
+								src={selectedImage}
+								alt="Vista previa"
+								className="w-full h-auto object-contain rounded-md border"
+							/>
 						)}
 					</div>
 					<DialogFooter className="sm:justify-start">
@@ -193,9 +237,9 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 							<Button
 								type="button"
 								variant="secondary"
-								onClick={handleAddImage}
+								onClick={() => setViewImageDialogOpen(false)}
 							>
-								Guardar Imagen
+								Cerrar
 							</Button>
 						</DialogClose>
 					</DialogFooter>
@@ -397,29 +441,36 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 					</form>
 				</Form>
 				<div className="mt-6">
-					<h2 className="text-xl font-semibold mb-4">Galería de Imágenes</h2>
-					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-						{galleryImages.map((image, index) => (
-							<img
-								key={index}
-								src={URL.createObjectURL(image)}
-								alt={`Imagen ${index + 1}`}
-								className="w-full h-40 object-cover rounded-md border"
-							/>
-						))}
-					</div>
+					<h2 className="text-xl font-semibold mb-2">Galería de Imágenes</h2>
 					<Button
 						variant="secondary"
 						size="default"
-						className="mt-4"
+						className="mb-4"
 						onClick={() => setIsDialogOpen(true)}
 					>
-						Agregar Imagen
+						Agregar Imágenes
 					</Button>
+					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+						{galleryImages.map((image, index) => (
+							<div key={index} className="relative">
+								<img
+									src={URL.createObjectURL(image)}
+									alt={`Imagen ${index + 1}`}
+									className="w-full h-40 object-cover rounded-md border cursor-pointer"
+									onClick={() => handleViewImage(URL.createObjectURL(image))}
+								/>
+								<button
+									onClick={() => handleRemoveImage(index)}
+									className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-3 bg-opacity-75"
+								>
+								</button>
+							</div>
+						))}
+					</div>
 				</div>
 			</div>
 			<div className="w-full md:w-[30%] mt-5 md:block md:pl-2 md:px-1 xl:px-16">
-				<h2 className="text-xl font-semibold">Vista previa</h2>
+				<h2 className="text-xl font-semibold my-4">Vista previa</h2>
 				<Card
 					key={cardDesc.web_id}
 					className="hover:shadow-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-shadow duration-300"
