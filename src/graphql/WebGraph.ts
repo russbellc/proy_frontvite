@@ -87,7 +87,11 @@ const uploadImage = async (image: File) => {
 
     try {
         console.log("Enviando solicitud de subida de archivo...");
-        const uploadResponse = await axiosClient.post('/upload', formData);
+        const uploadResponse = await axiosClient.post('/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
 
         console.log("Respuesta de la subida de archivo:", uploadResponse.data);
         return uploadResponse.data.fileUrl;
