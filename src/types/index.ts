@@ -136,8 +136,12 @@ export const formSchemaWeb = z.object({
     }).min(5).max(1000),
     web_img: z.string({
         required_error: "Ingresa una imagen",
-    }).url(),
+    }),
     web_st: z.number(),
+    web_galeria: z.array(z.object({
+        gal_id: z.number(),
+        gal_img: z.string().url(),
+    })),    
 });
 
 export type FormWeb = z.infer<typeof formSchemaWeb>;

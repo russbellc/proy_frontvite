@@ -117,16 +117,27 @@ export const createWeb = async (dataForm: FormWeb, image: File, allImages: File[
         const fileUrl = await uploadImage(image);
         dataForm.web_img = fileUrl;
 
+        // const allImageUrls = await Promise.all(allImages.map(async (img) => {
+        //     if (!isValidImage(img)) {
+        //         console.error("Tipo de archivo no válido:", img.type);
+        //         throw new Error('Invalid file type in allImages. Only images are allowed.');
+        //     }
+        //     return await uploadImage(img);
+        // }));
+
         return {
-            data: dataForm,
+            // data: { ...dataForm, allImageUrls },
+            data: { ...dataForm },
             success: true,
             msg: 'Imagen subida correctamente'
         };
     } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        console.error('Error al subir el archivo:', errorMsg);
         return {
             data: null,
             success: false,
-            msg: 'Error al subir el archivo: ' + (error instanceof Error ? error.message : 'Unknown error')
+            msg: 'Error al subir el archivo: ' + errorMsg
         };
     }
 }

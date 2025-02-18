@@ -39,6 +39,10 @@ interface IdefaultValues {
 	web_desc: string;
 	web_img: string;
 	web_st: number;
+	web_galeria: {
+		gal_id: number;
+		gal_img: string;
+	}[];
 }
 
 interface Props {
@@ -68,11 +72,41 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		},
 	});
 	const [galleryImages, setGalleryImages] = useState<File[]>([]);
+	const [galleryUrls, setGalleryUrls] = useState<
+		{ gal_id: number; gal_img: string }[]
+	>(defaultValues.web_galeria);
 	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 	const [newImages, setNewImages] = useState<File[]>([]);
 	const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
-	const [viewImageDialogOpen, setViewImageDialogOpen] = useState<boolean>(false);
+	const [viewImageDialogOpen, setViewImageDialogOpen] =
+		useState<boolean>(false);
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+	useEffect(() => {
+		const onchangeCard = () => {
+			setCardDesc({
+				web_id: defaultValues.web_id,
+				web_img: defaultValues.web_img,
+				web_titulo: defaultValues.web_titulo,
+				web_mini_desc: defaultValues.web_mini_desc,
+				web_fecha_create: new Date(),
+				tabweb_categoria: {
+					cat_nombre: defaultValues.web_categoria.toString(),
+				},
+			});
+		};
+
+		if (id !== "new") {
+			onchangeCard();
+		}
+	}, [
+		id,
+		defaultValues.web_id,
+		defaultValues.web_img,
+		defaultValues.web_titulo,
+		defaultValues.web_mini_desc,
+		defaultValues.web_categoria,
+	]);
 
 	useEffect(() => {
 		onCategoria();
@@ -119,12 +153,12 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 
 	const onSubmit = async (data: FormWeb) => {
 		if (imagePreview) {
-			const result = await createWeb(data, imagePreview,galleryImages);
+			// console.log(data);
+			const result = await createWeb(data, imagePreview, galleryImages);
 			console.log(result);
 		} else {
 			console.error("No image selected");
 		}
-		// console.log(data, id)
 	};
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,8 +196,12 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		setNewImagePreviews(previews);
 	};
 
-	const handleRemoveImage = (index: number) => {
+	const handleRemoveImageNew = (index: number) => {
 		setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+	};
+
+	const handleRemoveImageEdit = (gal_id: number) => {
+		setGalleryUrls((prev) => prev.filter((img) => img.gal_id !== gal_id));
 	};
 
 	const handleViewImage = (image: string) => {
@@ -386,35 +424,60 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 											</FormItem>
 										)}
 									/>
+									<FormLabel
+										className={cn(
+											"block text-sm font-semibold",
+											!form.register("web_img") && "text-muted-foreground"
+										)}
+									>
+										Imagen de portada
+									</FormLabel>
+									<Input
+										id="web_imgPortada"
+										type="file"
+										placeholder="Imagen de portada"
+										className="bg-accent w-full text-accent-foreground"
+										onChange={(e) => {
+											handleImageChange(e);
+											// form.setValue("web_img", "Portada");
+											form.setValue("web_img", URL.createObjectURL(e.target.files?.[0] || new Blob()));
+										}}
+									/>
 									<FormField
 										control={form.control}
 										name="web_img"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel
-													className={cn(
-														"block text-sm font-semibold",
-														!field.value && "text-muted-foreground"
-													)}
-												>
-													Imagen de portada
-												</FormLabel>
 												<FormControl>
-													<Input
-														{...field}
-														type="file"
-														className="bg-accent w-full text-accent-foreground"
-														onChange={(e) => {
-															field.onChange(e);
-															handleImageChange(e);
-														}}
-													/>
+													<input type="hidden" {...field} />
 												</FormControl>
 												<FormMessage />
-												{imagePreview && (
+												{id == "new" ? (
+													imagePreview && (
+														<div className="mt-6">
+															<img
+																src={URL.createObjectURL(imagePreview)}
+																alt="Vista previa"
+																className="w-full mt-4 h-80 object-contain rounded-md border"
+															/>
+														</div>
+													)
+												) : imagePreview ? (
 													<div className="mt-6">
 														<img
 															src={URL.createObjectURL(imagePreview)}
+															alt="Vista previa"
+															className="w-full mt-4 h-80 object-contain rounded-md border"
+														/>
+													</div>
+												) : (
+													<div className="mt-6">
+														<img
+															src={
+																typeof field.value === "string"
+																	? field.value
+																	: URL.createObjectURL(field.value)
+															}
 															alt="Vista previa"
 															className="w-full mt-4 h-80 object-contain rounded-md border"
 														/>
@@ -451,21 +514,53 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 						Agregar Imágenes
 					</Button>
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-						{galleryImages.map((image, index) => (
-							<div key={index} className="relative">
-								<img
-									src={URL.createObjectURL(image)}
-									alt={`Imagen ${index + 1}`}
-									className="w-full h-40 object-cover rounded-md border cursor-pointer"
-									onClick={() => handleViewImage(URL.createObjectURL(image))}
-								/>
-								<button
-									onClick={() => handleRemoveImage(index)}
-									className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-3 bg-opacity-75"
-								>
-								</button>
-							</div>
+						{id === "new"
+							? galleryImages.map((image, index) => (
+									<div key={index} className="relative">
+										<img
+											src={URL.createObjectURL(image)}
+											alt={`Imagen ${index + 1}`}
+											className="w-full h-40 object-cover rounded-md border cursor-pointer"
+											onClick={() =>
+												handleViewImage(URL.createObjectURL(image))
+											}
+										/>
+										<button
+											onClick={() => handleRemoveImageNew(index)}
+											className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-3 bg-opacity-75"
+										></button>
+									</div>
+						))
+							: galleryUrls.map((image, index) => (
+									<div key={index} className="relative">
+										<img
+											src={image.gal_img}
+											alt={`Imagen ${index + 1}`}
+											className="w-full h-40 object-cover rounded-md border cursor-pointer"
+											onClick={() => handleViewImage(image.gal_img)}
+										/>
+										<button
+											onClick={() => handleRemoveImageEdit(image.gal_id)}
+											className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-3 bg-opacity-75"
+										></button>
+									</div>
 						))}
+
+						{id !== "new" &&
+							galleryImages.map((image, index) => (
+								<div key={index} className="relative">
+									<img
+										src={URL.createObjectURL(image)}
+										alt={`Imagen ${index + 1}`}
+										className="w-full h-40 object-cover rounded-md border cursor-pointer"
+										onClick={() => handleViewImage(URL.createObjectURL(image))}
+									/>
+									<button
+										onClick={() => handleRemoveImageNew(index)}
+										className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-3 bg-opacity-75"
+									></button>
+								</div>
+							))}
 					</div>
 				</div>
 			</div>
