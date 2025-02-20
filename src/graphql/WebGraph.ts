@@ -1,7 +1,23 @@
 import { client3 } from "@/client";
-import { FormWeb } from "@/types";
+// import { FormWeb } from "@/types";
 import axiosClient from "@/client/axiosClient";
 import { gql } from "graphql-request";
+
+export interface FormWeb {
+    web_id?:        number;
+    web_categoria: number;
+    web_titulo:    string;
+    web_mini_desc: string;
+    web_desc:      string;
+    web_img:       string;
+    web_st:        number;
+    web_galeria:   WebGaleria[];
+  }
+  
+  export interface WebGaleria {
+    gal_id:  number;
+    gal_img: string;
+  }
 
 interface Icategoria {
     getAll_web_categoria: [
@@ -10,6 +26,12 @@ interface Icategoria {
             cat_nombre: string,
         }
     ]
+}
+
+interface Icreate_web {
+    create_web: {
+        web_id: number;
+    }
 }
 
 interface IError {
@@ -117,31 +139,53 @@ export const createWeb = async (dataForm: FormWeb, image: File, allImages: File[
         };
     }
 
+    if (dataForm.web_mini_desc.length > 100) {
+        console.error("La mini descripción no puede exceder los 45 caracteres");
+        return {
+            data: null,
+            success: false,
+            msg: 'La mini descripción no puede exceder los 45 caracteres'
+        };
+    }
+
+    const mutationWeb = gql`
+        mutation Mutation($web: webForm!) {
+            create_web(web: $web) {
+                web_id
+            }
+        }
+    `;
+
     try {
         const fileUrl = await uploadImage(image);
         dataForm.web_img = fileUrl;
 
-        // const allImageUrls = await Promise.all(allImages.map(async (img) => {
-        //     if (!isValidImage(img)) {
-        //         console.error("Tipo de archivo no válido:", img.type);
-        //         throw new Error('Invalid file type in allImages. Only images are allowed.');
-        //     }
-        //     return await uploadImage(img);
-        // }));
+        const web_galeria = await Promise.all(allImages.map(async (img, index) => {
+            if (!isValidImage(img)) {
+                console.error("Tipo de archivo no válido:", img.type);
+                throw new Error('Invalid file type in allImages. Only images are allowed.');
+            }
+            const gal_img = await uploadImage(img);
+            return { gal_id: index, gal_img };
+        }));
+
+        const webData = { ...dataForm, web_galeria };
+        delete webData.web_id; // Eliminar el campo web_id
+
+        const data: Icreate_web = await client3.request(mutationWeb, { web: webData });
 
         return {
-            // data: { ...dataForm, allImageUrls },
-            data: { ...dataForm },
+            data: data.create_web,
             success: true,
             msg: 'Imagen subida correctamente'
         };
     } catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-        console.error('Error al subir el archivo:', errorMsg);
+        console.error('Error al crear web:', errorMsg);
         return {
             data: null,
             success: false,
-            msg: 'Error al subir el archivo: ' + errorMsg
+            msg: 'Error al crear web: ' + errorMsg
         };
     }
 }

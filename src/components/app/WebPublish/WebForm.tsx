@@ -30,6 +30,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks";
 
 interface IdefaultValues {
 	web_id: number;
@@ -55,7 +57,15 @@ interface Icategoria {
 	cat_nombre: string;
 }
 
+interface ToastOptions {
+	title: string;
+	description: string;
+	status: "success" | "error" | "info";
+}
+
 export const WebForm: FC<Props> = ({ id, defaultValues }) => {
+	const { toast } = useToast();
+	const navigate = useNavigate();
 	const [estado, setEstado] = useState(false);
 	const [categoria, setCategoria] = useState<Icategoria[]>([]);
 	const [imagePreview, setImagePreview] = useState<File | null>(null);
@@ -155,7 +165,23 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		if (imagePreview) {
 			// console.log(data);
 			const result = await createWeb(data, imagePreview, galleryImages);
-			console.log(result);
+			if (result) {
+				const { data, success, msg } = result;
+				if (success && data) {
+					console.log(data); // Aquí puedes acceder a los datos si la creación fue exitosa
+					navigate("/web/");
+					// return toast mesage sussess save data
+					toast({
+						title: "Éxito",
+						description: "Datos guardados correctamente.",
+						status: "success",
+					} as ToastOptions);
+				} else {
+					console.log(data, success, msg);
+				}
+			} else {
+				console.log("Error desconocido, no se obtuvo respuesta.");
+			}
 		} else {
 			console.error("No image selected");
 		}
@@ -440,7 +466,10 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 										onChange={(e) => {
 											handleImageChange(e);
 											// form.setValue("web_img", "Portada");
-											form.setValue("web_img", URL.createObjectURL(e.target.files?.[0] || new Blob()));
+											form.setValue(
+												"web_img",
+												URL.createObjectURL(e.target.files?.[0] || new Blob())
+											);
 										}}
 									/>
 									<FormField
