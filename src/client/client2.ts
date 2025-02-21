@@ -1,8 +1,8 @@
 import { ApolloClient, ApolloLink, createHttpLink, InMemoryCache } from "@apollo/client";
 
 const httpLink = createHttpLink({
-    // uri: "https://backend-crox.up.railway.app/",
-    uri: import.meta.env.VITE_GRAPH_SERVER,
+    uri: "https://backend-crox.up.railway.app/graphql",
+    // uri: import.meta.env.VITE_GRAPH_SERVER,
 })
 
 const authLink = new ApolloLink((operation, forward) => {
