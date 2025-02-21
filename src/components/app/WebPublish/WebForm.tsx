@@ -15,7 +15,12 @@ import {
 	Button,
 	ScrollArea,
 } from "@/components/ui";
-import { CategoriasGql, createWeb } from "@/graphql/WebGraph";
+import {
+	CategoriasGql,
+	createWeb,
+	// isValidImage,
+	// uploadImage,
+} from "@/graphql/WebGraph";
 import { cn } from "@/lib/utils";
 import { formSchemaWeb, FormWeb } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,7 +36,10 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks";
+import { useSaveFieldWeb, useToast } from "@/hooks";
+import { debounce } from "lodash";
+// import { client3 } from "@/client";
+// import { gql } from "graphql-request";
 
 interface IdefaultValues {
 	web_id: number;
@@ -92,6 +100,35 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		useState<boolean>(false);
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+	const form = useForm<FormWeb>({
+		resolver: zodResolver(formSchemaWeb),
+		defaultValues,
+	});
+
+	const { saveField } = useSaveFieldWeb(id, imagePreview, setImagePreview);
+
+	const debouncedSave = debounce(
+		(fieldName: keyof FormWeb, value: unknown) => {
+			saveField(fieldName, value);
+		},
+		1000 // 500 ms de espera antes de ejecutar
+	);
+
+	useEffect(() => {
+		// Subscribirse a los cambios de todos los campos
+		if (id !== "new") {
+			const subscription = form.watch((value, { name }) => {
+				if (name) {
+					debouncedSave(
+						name as keyof FormWeb,
+						(value as FormWeb)[name as keyof FormWeb]
+					);
+				}
+			});
+			return () => subscription.unsubscribe();
+		}
+	}, [debouncedSave, form, id]);
+
 	useEffect(() => {
 		const onchangeCard = () => {
 			setCardDesc({
@@ -122,11 +159,6 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		onCategoria();
 	}, []);
 
-	const form = useForm<FormWeb>({
-		resolver: zodResolver(formSchemaWeb),
-		defaultValues,
-	});
-
 	useEffect(() => {
 		const subscription = form.watch((value) => {
 			setCardDesc((prev) => ({
@@ -142,10 +174,6 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 		});
 		return () => subscription.unsubscribe();
 	}, [form, categoria]);
-
-	useEffect(() => {
-		console.log(imagePreview);
-	}, [imagePreview]);
 
 	const onCategoria = async () => {
 		const categoria = await CategoriasGql();
@@ -168,7 +196,7 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 			if (result) {
 				const { data, success, msg } = result;
 				if (success && data) {
-					console.log(data); // Aquí puedes acceder a los datos si la creación fue exitosa
+					// console.log(data); // Aquí puedes acceder a los datos si la creación fue exitosa
 					navigate("/web/");
 					// return toast mesage sussess save data
 					toast({
@@ -190,8 +218,8 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
-			console.log("Archivo seleccionado:", file);
-			console.log("Tipo MIME del archivo seleccionado:", file.type);
+			// console.log("Archivo seleccionado:", file);
+			// console.log("Tipo MIME del archivo seleccionado:", file.type);
 
 			const reader = new FileReader();
 			reader.onloadend = () => {

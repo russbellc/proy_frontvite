@@ -98,40 +98,35 @@ export const CategoriasGql = async () => {
     }
 }
 
-const isValidImage = (image: File) => {
+export const isValidImage = (image: File) => {
     const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
     return image.type && validMimeTypes.includes(image.type);
 };
 
-const uploadImage = async (image: File) => {
+export const uploadImage = async (image: File) => {
     const formData = new FormData();
     formData.append("file", image);
-
     try {
-        console.log("Enviando solicitud de subida de archivo...");
         const uploadResponse = await axiosClient.post('/upload', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
-
-        console.log("Respuesta de la subida de archivo:", uploadResponse.data);
         return uploadResponse.data.fileUrl;
     } catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-        console.error('Error al subir el archivo:', errorMsg);
         throw new Error('Error al subir el archivo: ' + errorMsg);
     }
 };
 
 export const createWeb = async (dataForm: FormWeb, image: File, allImages: File[]) => {
-    console.log("Datos del formulario:", dataForm);
-    console.log("Archivo de imagen:", image);
-    console.log("Tipo MIME del archivo:", image.type);
-    console.log("AllImages :", allImages.length);
+    // console.log("Datos del formulario:", dataForm);
+    // console.log("Archivo de imagen:", image);
+    // console.log("Tipo MIME del archivo:", image.type);
+    // console.log("AllImages :", allImages.length);
 
     if (!isValidImage(image)) {
-        console.error("Tipo de archivo no válido:", image.type);
+        // console.error("Tipo de archivo no válido:", image.type);
         return {
             data: null,
             success: false,
@@ -139,8 +134,7 @@ export const createWeb = async (dataForm: FormWeb, image: File, allImages: File[
         };
     }
 
-    if (dataForm.web_mini_desc.length > 100) {
-        console.error("La mini descripción no puede exceder los 45 caracteres");
+    if (dataForm.web_mini_desc.length > 45) {
         return {
             data: null,
             success: false,
