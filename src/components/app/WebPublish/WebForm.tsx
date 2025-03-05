@@ -18,13 +18,13 @@ import {
 import {
 	CategoriasGql,
 	createWeb,
-	// isValidImage,
-	// uploadImage,
+	isValidImage,
+	uploadImage,
 } from "@/graphql/WebGraph";
 import { cn } from "@/lib/utils";
 import { formSchemaWeb, FormWeb } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
 	Dialog,
@@ -36,10 +36,10 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
-import { useSaveFieldWeb, useToast } from "@/hooks";
+import { useToast } from "@/hooks";
 import { debounce } from "lodash";
-// import { client3 } from "@/client";
-// import { gql } from "graphql-request";
+import { client3 } from "@/client";
+import { gql } from "graphql-request";
 
 interface IdefaultValues {
 	web_id: number;
@@ -80,7 +80,7 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 	const [cardDesc, setCardDesc] = useState({
 		web_id: 2,
 		web_img:
-			"https://res.cloudinary.com/dgzxplp31/image/upload/c_scale,h_400,w_400/samples/dessert-on-a-plate",
+			"https://res.cloudinary.com/dgzxplp31/image/upload/c_scale,h_400,w_400/samples/animals/cat",
 		web_titulo: "Titulo de la publicación",
 		web_mini_desc:
 			"Descripción corta de la publicación para mostrar en la lista de publicaciones de la web de la institución.",
@@ -99,13 +99,88 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 	const [viewImageDialogOpen, setViewImageDialogOpen] =
 		useState<boolean>(false);
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
+	const [saving, setSaving] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const form = useForm<FormWeb>({
 		resolver: zodResolver(formSchemaWeb),
 		defaultValues,
 	});
 
-	const { saveField } = useSaveFieldWeb(id, imagePreview, setImagePreview);
+	const saveImagePortada = useCallback(
+		async (img: File) => {
+			const fileUrl = await uploadImage(img);
+			console.log("fileUrl:", fileUrl);
+			setImagePreview(null); // Limpiar la imagen previa después de subirla
+			await client3.request<{
+				update_web?: { web_id: number };
+			}>(
+				gql`
+					mutation Update_web(
+						$webId: Int!
+						$fieldName: String!
+						$value: String
+					) {
+						update_web(web_id: $webId, fieldName: $fieldName, value: $value) {
+							web_id
+						}
+					}
+				`,
+				{
+					webId: +id, // Asegurarte de convertir `id` a número si es necesario
+					fieldName: "web_img", // Sin comillas adicionales
+					value: String(fileUrl), // Asegúrate de convertir el valor a string si es necesario
+				}
+			);
+		},
+		[id]
+	);
+
+	useEffect(() => {
+		if (id !== "new" && imagePreview) {
+			console.log("imagePreview in useEffect:", imagePreview);
+			if (!isValidImage(imagePreview)) {
+				setSaving(false); // Ocultar indicador de guardado
+			} else {
+				saveImagePortada(imagePreview);
+			}
+		}
+	}, [imagePreview, id, saveImagePortada]);
+
+	const saveField = async (fieldName: string, value: unknown) => {
+		console.log("debouncedSave:", fieldName, value);
+		setSaving(true); // Mostrar indicador de guardado
+		try {
+			if (fieldName !== "web_img") {
+				await client3.request<{
+					update_web?: { web_id: number };
+				}>(
+					gql`
+						mutation Update_web(
+							$webId: Int!
+							$fieldName: String!
+							$value: String
+						) {
+							update_web(web_id: $webId, fieldName: $fieldName, value: $value) {
+								web_id
+								web_st
+							}
+						}
+					`,
+					{
+						webId: +id, // Asegurarte de convertir `id` a número si es necesario
+						fieldName: fieldName, // Sin comillas adicionales
+						value: String(value), // Asegúrate de convertir el valor a string si es necesario
+					}
+				);
+			}
+		} catch (error) {
+			console.error(`Error al guardar el campo ${fieldName}:`, error);
+			console.log(saving);
+		} finally {
+			setSaving(false); // Ocultar indicador de guardado
+		}
+	};
 
 	const debouncedSave = debounce(
 		(fieldName: keyof FormWeb, value: unknown) => {
@@ -190,6 +265,7 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 	};
 
 	const onSubmit = async (data: FormWeb) => {
+		setIsSubmitting(true);
 		if (imagePreview) {
 			// console.log(data);
 			const result = await createWeb(data, imagePreview, galleryImages);
@@ -204,22 +280,35 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 						description: "Datos guardados correctamente.",
 						status: "success",
 					} as ToastOptions);
+					setIsSubmitting(false);
 				} else {
 					console.log(data, success, msg);
+					setIsSubmitting(false);
 				}
 			} else {
 				console.log("Error desconocido, no se obtuvo respuesta.");
+				setIsSubmitting(false);
 			}
 		} else {
 			console.error("No image selected");
+			setIsSubmitting(false);
 		}
 	};
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
-			// console.log("Archivo seleccionado:", file);
-			// console.log("Tipo MIME del archivo seleccionado:", file.type);
+			const validImageTypes = [
+				"image/jpeg",
+				"image/png",
+				"image/gif",
+				"image/bmp",
+				"image/webp",
+			];
+			if (!validImageTypes.includes(file.type)) {
+				console.log("Invalid file type. Only images are allowed.");
+				return;
+			}
 
 			const reader = new FileReader();
 			reader.onloadend = () => {
@@ -227,8 +316,15 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 				setCardDesc((prev) => ({ ...prev, web_img: reader.result as string }));
 			};
 			reader.readAsDataURL(file);
+			if (id !== "new") {
+				setImagePreview(file);
+				form.setValue("web_img", URL.createObjectURL(file));
+			} else {
+				setImagePreview(file);
+				form.setValue("web_img", URL.createObjectURL(file || new Blob()));
+			}
 		} else {
-			setImagePreview(null);
+			// setImagePreview(null);
 		}
 	};
 
@@ -244,7 +340,20 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 	const handleGalleryImagesChange = (
 		e: React.ChangeEvent<HTMLInputElement>
 	) => {
-		const files = Array.from(e.target.files || []);
+		const validImageTypes = [
+			"image/jpeg",
+			"image/png",
+			"image/gif",
+			"image/bmp",
+			"image/webp",
+		];
+		const files = Array.from(e.target.files || []).filter((file) => {
+			if (!validImageTypes.includes(file.type)) {
+				console.log("Invalid file type. Only images are allowed.");
+				return false;
+			}
+			return true;
+		});
 		setNewImages(files);
 		const previews = files.map((file) => URL.createObjectURL(file));
 		setNewImagePreviews(previews);
@@ -469,8 +578,11 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 													<Switch
 														id="web_st"
 														checked={field.value === 1}
-														onCheckedChange={(checked: boolean) =>
-															field.onChange(checked ? 1 : 0)
+														onCheckedChange={
+															(checked: boolean) => {
+																form.setValue("web_st", checked ? 1 : 0);
+															}
+															// field.onChange(checked ? 1 : 0)
 														}
 													/>
 												</FormControl>
@@ -494,10 +606,10 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 										onChange={(e) => {
 											handleImageChange(e);
 											// form.setValue("web_img", "Portada");
-											form.setValue(
-												"web_img",
-												URL.createObjectURL(e.target.files?.[0] || new Blob())
-											);
+											// form.setValue(
+											// 	"web_img",
+											// 	URL.createObjectURL(e.target.files?.[0] || new Blob())
+											// );
 										}}
 									/>
 									<FormField
@@ -550,6 +662,7 @@ export const WebForm: FC<Props> = ({ id, defaultValues }) => {
 												variant="secondary"
 												size="default"
 												className="w-full sm:w-auto"
+												disabled={isSubmitting}
 											>
 												Guardar
 											</Button>

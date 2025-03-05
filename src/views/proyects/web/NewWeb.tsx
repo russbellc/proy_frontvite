@@ -27,6 +27,7 @@ interface DataWeb {
 		web_mini_desc: string;
 		web_desc: string;
 		web_img: string;
+		web_st: number;
 		tabweb_categoria: {
 			cat_id: number;
 			cat_nombre: string;
@@ -68,6 +69,7 @@ export const NewWeb: FC = () => {
 							web_categoria
 							web_mini_desc
 							web_desc
+							web_st
 							web_img
 							tabweb_categoria {
 								cat_id
@@ -89,6 +91,7 @@ export const NewWeb: FC = () => {
 						web_mini_desc,
 						web_desc,
 						web_img,
+						web_st,
 						web_galeria,
 					} = getOne_web;
 					setDefaultValues({
@@ -98,7 +101,7 @@ export const NewWeb: FC = () => {
 						web_mini_desc,
 						web_desc,
 						web_img,
-						web_st: 1,
+						web_st,
 						web_galeria: web_galeria.map((gal) => ({
 							gal_id: gal.gal_id,
 							gal_img: gal.gal_img,

@@ -78,6 +78,30 @@ export const ListaWebPublish: FC<Props> = ({ searchTerm }) => {
 		}
 	};
 
+	const handleCheckboxChange = async (id: number, checked: boolean) => {
+		try {
+			await client3.request<{
+				update_web?: { web_id: number };
+			}>(
+				gql`
+					mutation Update_web($webId: Int!, $fieldName: String!, $value: String) {
+						update_web(web_id: $webId, fieldName: $fieldName, value: $value) {
+							web_id
+						}
+					}
+				`,
+				{
+					webId: id,
+					fieldName: "web_st",
+					value: checked ? "1" : "0",
+				}
+			);
+			console.log("Estado cambiado");
+		} catch (error) {
+			console.error(`Error al cambiar el estado:`, error);
+		}
+	};
+
 	const GET_POSTS_CLIENT1 = gql`
 		{
 			getAll_web(
@@ -165,15 +189,20 @@ export const ListaWebPublish: FC<Props> = ({ searchTerm }) => {
 		}));
 	};
 
+	const getOptimizedImageUrl = (url: string) => {
+		const parts = url.split('/upload/');
+		return `${parts[0]}/upload/c_scale,w_400/${parts[1]}`;
+	};
+
 	return (
 		<>
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 				{web_publish.map((node) => (
 					<Card key={node.web_id} className="hover:shadow-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-shadow duration-300">
 						<img
-							src={node.web_img}
+							src={getOptimizedImageUrl(node.web_img)}
 							alt={node.web_titulo}
-							className="w-full h-32 object-cover rounded-t-md"
+							className="w-full h-64 object-cover rounded-t-md"
 						/>
 						<CardContent>
 							<h3 className="text-lg font-bold pt-3">{node.web_titulo}</h3>
@@ -200,7 +229,7 @@ export const ListaWebPublish: FC<Props> = ({ searchTerm }) => {
 								</Button>
 								<Checkbox
 									checked={node.web_st === 1}
-									onCheckedChange={() => console.log("Estado cambiado")}
+									onCheckedChange={(checked: boolean) => handleCheckboxChange(node.web_id, checked)}
 								/>
 							</div>
 						</CardContent>
